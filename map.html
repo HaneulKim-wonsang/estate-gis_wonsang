@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>보유 부동산 지도</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{--bg:#eceee8;--pn:#fbfbf8;--ink:#22302a;--mut:#667068;--ln:#cdd3c8;--ac:#b3601a}
+@media(prefers-color-scheme:dark){:root{--bg:#171c19;--pn:#202723;--ink:#e4e9e2;--mut:#98a39a;--ln:#38423b;--ac:#e2944f}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 'Noto Sans KR',system-ui,sans-serif;display:grid;grid-template-columns:1fr 360px;grid-template-rows:auto 1fr}
+@media(max-width:860px){body{grid-template-columns:1fr;grid-template-rows:auto 55vh auto;height:auto}}
+header{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:var(--pn);border-bottom:1px solid var(--ln)}
+header b{margin-right:6px}header input[type=text]{flex:1;min-width:200px}header input[type=number]{width:80px}
+input,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:5px 8px}
+button{cursor:pointer;background:var(--pn)}button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+#map{min-height:300px;z-index:0}
+aside{background:var(--pn);border-left:1px solid var(--ln);overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.m{color:var(--mut);font-size:12px}h3{margin:0;font-size:14px}
+#log{font-size:12px;background:var(--bg);border:1px solid var(--ln);padding:6px;max-height:110px;overflow:auto;white-space:pre-wrap}#log .e{color:#c0392b}
+#list{max-height:200px;overflow:auto;border-top:1px solid var(--ln)}#list div{display:flex;justify-content:space-between;gap:6px;padding:5px 2px;border-bottom:1px solid var(--ln);cursor:pointer}#list div.on{background:rgba(179,96,26,.2)}
+dl{display:grid;grid-template-columns:90px 1fr;gap:2px 8px;margin:6px 0}dt{color:var(--mut)}dd{margin:0;word-break:break-all}
+.jl{background:none;border:0;box-shadow:none;font-size:11px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;display:none}.jl:before{display:none}.lab .jl{display:block}
+details{font-size:12px}pre{white-space:pre-wrap;word-break:break-all;margin:4px 0}
+</style></head><body>
+<header><b>보유 부동산 지도</b>
+<input type="text" id="adr" value="경기도 광주시 탄벌동 214-4" aria-label="중심 주소">
+<label class="m">반경(m) <input type="number" id="rad" value="500" min="50" max="3000" step="50"></label>
+<button class="p" id="go">필지 불러오기</button></header>
+<div id="map"></div>
+<aside>
+<div><label class="m"><input type="checkbox" id="mm"> 여러 필지 선택</label></div>
+<div id="info"><p class="m">필지를 불러온 뒤 지도에서 클릭하세요.</p></div>
+<h3>불러온 필지 <span class="m" id="cnt"></span></h3>
+<input type="text" id="flt" placeholder="지번·주소 검색" aria-label="필지 검색">
+<div id="list"></div>
+<h3>진행 상태</h3><div id="log"></div>
+</aside>
+<script>
+const KEY='48B105CA-7F59-416B-B845-479BD1FF7B3B',DOM='haneulkim-wonsang.github.io';
+const $=s=>document.querySelector(s),q=o=>Object.entries(o).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+const log=(m,e)=>{const d=document.createElement('div');d.textContent=m;if(e)d.className='e';$('#log').append(d);$('#log').scrollTop=1e6};
+let jc=0;
+function jsonp(url){return new Promise((ok,no)=>{const n='__vw'+(++jc),s=document.createElement('script');
+const cl=()=>{clearTimeout(t);delete window[n];s.remove()},t=setTimeout(()=>{cl();no(new Error('응답 시간 초과'))},20000);
+window[n]=d=>{cl();ok(d)};s.onerror=()=>{cl();no(new Error('호출 실패: 인증키·도메인 또는 네트워크를 확인하세요'))};
+s.src=url+'&callback='+n;document.head.append(s)})}
+const tl=(l,ext)=>L.tileLayer(`https://api.vworld.kr/req/wmts/1.0.0/${KEY}/${l}/{z}/{y}/{x}.${ext}`,{maxZoom:20,maxNativeZoom:19,attribution:'© VWorld'});
+const base=tl('Base','png'),sat=tl('Satellite','jpeg'),hyb=tl('Hybrid','png');
+const map=L.map('map',{layers:[base],center:[37.40,127.26],zoom:15});
+L.control.layers({'일반지도':base,'위성지도':sat},{'지명(위성용)':hyb}).addTo(map);
+base.on('tileerror',()=>{if(!base._te){base._te=1;log('배경지도 타일을 불러오지 못했습니다. 인증키·도메인 확인 필요',1)}});
+map.on('zoomend',()=>map.getContainer().classList.toggle('lab',map.getZoom()>=18));
+const grp=L.layerGroup().addTo(map),byP=new Map();let sel=new Set();
+const ST={color:'#888',weight:1,fillColor:'#fff',fillOpacity:.15},SS={color:'#b3601a',weight:3,fillColor:'#b3601a',fillOpacity:.4};
+function areaM2(g){const rings=g.type=='Polygon'?[g.coordinates]:g.coordinates,lat0=rings[0][0][0][1],kx=111320*Math.cos(lat0*Math.PI/180),ky=110540;
+const sh=r=>{let s=0;for(let i=0;i<r.length-1;i++)s+=r[i][0]*kx*r[i+1][1]*ky-r[i+1][0]*kx*r[i][1]*ky;return Math.abs(s)/2};
+return rings.reduce((t,p)=>t+sh(p[0])-p.slice(1).reduce((u,h)=>u+sh(h),0),0)}
+const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+async function load(){$('#go').disabled=true;grp.clearLayers();byP.clear();sel.clear();$('#log').innerHTML='';
+try{const a=$('#adr').value.trim(),R=+$('#rad').value||500;log('주소 검색 중: '+a);
+const g=await jsonp('https://api.vworld.kr/req/address?'+q({service:'address',request:'getCoord',version:'2.0',crs:'epsg:4326',address:a,refine:'true',simple:'false',format:'json',type:'PARCEL',key:KEY,domain:DOM}));
+if(g.response.status!=='OK')throw new Error('주소 검색 실패: '+JSON.stringify(g.response.error||g.response.status));
+const x=+g.response.result.point.x,y=+g.response.result.point.y;log(`좌표 확인: ${y.toFixed(5)}, ${x.toFixed(5)}`);
+const dy=R/110540,dx=R/(111320*Math.cos(y*Math.PI/180)),bb=`BOX(${x-dx},${y-dy},${x+dx},${y+dy})`;
+map.setView([y,x],17);let p=1,tot=1;
+do{const r=await jsonp('https://api.vworld.kr/req/data?'+q({service:'data',request:'GetFeature',data:'LP_PA_CBND_BUBUN',key:KEY,domain:DOM,format:'json',size:1000,page:p,geometry:'true',attribute:'true',crs:'EPSG:4326',geomFilter:bb}));
+if(r.response.status!=='OK')throw new Error('필지 조회 실패: '+JSON.stringify(r.response.error||r.response.status));
+tot=+(r.response.page?.total||1);const fs=r.response.result.featureCollection.features;
+fs.forEach(f=>{const id=f.properties.pnu;if(byP.has(id))return;const ly=L.geoJSON(f,{style:ST}).addTo(grp);
+ly.bindTooltip(f.properties.jibun||'',{permanent:true,direction:'center',className:'jl'});ly.on('click',()=>pick(id));
+byP.set(id,{f,ly,area:areaM2(f.geometry)})});log(`${p}/${tot} 페이지 처리, 누적 ${byP.size}필지`);p++}while(p<=tot&&p<=10);
+const t=[...byP.entries()].find(([k,v])=>(v.f.properties.addr||'').replace(/\s/g,'').endsWith(a.split(' ').pop()));if(t)pick(t[0]);
+log('완료: '+byP.size+'필지',0)}catch(e){log(e.message,1)}
+$('#go').disabled=false;render()}
+function pick(id){if($('#mm').checked){sel.has(id)?sel.delete(id):sel.add(id)}else sel=new Set([id]);render()}
+function render(){byP.forEach((v,k)=>v.ly.setStyle(sel.has(k)?SS:ST));$('#cnt').textContent=byP.size?`(${byP.size}개)`:'';
+const fl=$('#flt').value.trim(),ar=[...byP.entries()].filter(([k,v])=>!fl||(v.f.properties.addr+v.f.properties.jibun).includes(fl));
+$('#list').innerHTML=ar.map(([k,v])=>`<div data-id="${k}" class="${sel.has(k)?'on':''}"><span>${v.f.properties.addr||v.f.properties.jibun}</span><span class="m">${fmt(v.area)}㎡</span></div>`).join('');
+const S=[...sel].map(k=>byP.get(k)).filter(Boolean);if(!S.length){$('#info').innerHTML='<p class="m">필지를 불러온 뒤 지도에서 클릭하세요.</p>';return}
+const ta=S.reduce((s,v)=>s+v.area,0),sum=`<dl><dt>선택 필지</dt><dd>${S.length}개</dd><dt>면적 합계</dt><dd>${fmt(ta)}㎡ (${fmt(ta*.3025)}평)</dd></dl>`;
+if(S.length>1){$('#info').innerHTML=sum+`<button id="csv">선택 필지 CSV 내려받기</button>`;return}
+const v=S[0],p=v.f.properties;
+$('#info').innerHTML=`<h3>${p.addr||''}</h3><dl><dt>지번</dt><dd>${p.jibun||'-'}</dd><dt>PNU</dt><dd>${p.pnu}</dd><dt>도형 계산 면적</dt><dd>${fmt(v.area)}㎡ (${fmt(v.area*.3025)}평)</dd><dt>공시지가</dt><dd>${p.jiga?fmt(p.jiga)+'원/㎡ ('+p.gosi_year+'-'+p.gosi_month+')':'-'}</dd></dl>
+<p class="m">면적은 지적도 도형으로 계산한 참고값이며 토지대장 면적과 다를 수 있습니다.</p><button id="csv">CSV 내려받기</button><details><summary>API 원본 속성</summary><pre>${JSON.stringify(p,null,1)}</pre></details>`}
+document.addEventListener('click',e=>{const d=e.target.closest('#list [data-id]');if(d){const id=d.dataset.id;if(!$('#mm').checked)sel=new Set([id]);else sel.has(id)?sel.delete(id):sel.add(id);render();map.fitBounds(byP.get(id).ly.getBounds(),{maxZoom:19});return}
+if(e.target.id=='csv'){const rows=[['PNU','주소','지번','도형면적㎡','공시지가']].concat([...sel].map(k=>{const v=byP.get(k),p=v.f.properties;return[p.pnu,p.addr,p.jibun,Math.round(v.area),p.jiga||'']}));
+const b=new Blob(['\ufeff'+rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='parcels.csv';a.click()}});
+$('#flt').oninput=render;$('#go').onclick=load;load();
+</script></body></html>
