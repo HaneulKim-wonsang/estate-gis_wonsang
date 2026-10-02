@@ -4,6 +4,7 @@
 <title>보유 부동산 지도</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#eceee8;--pn:#fbfbf8;--ink:#22302a;--mut:#667068;--ln:#cdd3c8;--ac:#b3601a}
 @media(prefers-color-scheme:dark){:root{--bg:#171c19;--pn:#202723;--ink:#e4e9e2;--mut:#98a39a;--ln:#38423b;--ac:#e2944f}}
@@ -29,14 +30,18 @@ fieldset{border:1px solid var(--ln);border-radius:4px;margin:6px 0;padding:6px}l
 #lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 10px}
 .li{display:flex;align-items:center;gap:6px;cursor:pointer}.li span:nth-child(2){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .jl{background:none;border:0;box-shadow:none;font-size:11px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;display:none}.jl:before{display:none}.lab .jl{display:block}
+#mw{flex:1;display:flex;min-height:0}#rg{width:210px;overflow:auto;border-right:1px solid var(--ln);padding:4px 0;font-size:12px;flex:none}
+@media(max-width:860px){#mw{flex-direction:column}#rg{width:auto;max-height:24vh;border-right:0;border-bottom:1px solid var(--ln)}}
+.rn{display:flex;gap:4px;padding:3px 6px;cursor:pointer;align-items:center}.rn:hover{background:var(--bg)}.rn i{width:10px;font-style:normal;color:var(--mut)}.rn span{flex:1}
+.rn b{background:var(--ac);color:#fff;border-radius:9px;padding:0 6px;font-size:11px;font-weight:400}.rn.z{color:var(--mut);opacity:.6}.rn.on{outline:1px solid var(--ac)}
 </style></head><body>
 <div id="app">
 <section id="mapcell"><div id="bar">
 <input type="text" id="adr" value="경기도 광주시 탄벌동 214-4" aria-label="주소">
 <button id="fnd">주소로 필지 찾기</button>
 <label><input type="checkbox" id="add"> 필지 추가 모드</label>
-<button id="exp">백업 저장</button><button id="imp">백업 불러오기</button><input type="file" id="fi" accept=".json" hidden>
-<span id="msg" class="m"></span></div><div id="map"></div></section>
+<button id="xl">엑셀 일괄 등록</button><button id="xt">양식 받기</button><input type="file" id="xf" accept=".xlsx,.xls,.csv" hidden><button id="exp">백업 저장</button><button id="imp">백업 불러오기</button><input type="file" id="fi" accept=".json" hidden>
+<span id="msg" class="m"></span></div><div id="mw"><div id="rg"></div><div id="map"></div></div></section>
 <section id="legend"><h3>범례 <span class="m" id="tot"></span></h3><div id="lg"></div></section>
 <aside id="side"></aside>
 </div>
@@ -72,7 +77,7 @@ const useArea=p=>+p.larea||p.area||0;
 function sty(k){const o=curOwner(DB.p[k]),s=cur&&cur.key==k;return{color:s?'#000':'#222',weight:s?4:1.5,fillColor:colorOf(o.name),fillOpacity:.6}}
 function drawAll(){reg.clearLayers();LY={};Object.entries(DB.p).forEach(([k,p])=>{if(!curOwner(p))return;
 const ly=L.geoJSON(p.f,{style:sty(k)}).addTo(reg);ly.eachLayer(l=>l.options.bubblingMouseEvents=false);
-ly.bindTooltip(p.f.properties.jibun||'',{permanent:true,direction:'center',className:'jl'});ly.on('click',()=>selReg(k));LY[k]=ly});save();legend()}
+ly.bindTooltip(p.f.properties.jibun||'',{permanent:true,direction:'center',className:'jl'});ly.on('click',()=>selReg(k));LY[k]=ly});save();legend();rgRender()}
 function restyle(){Object.entries(LY).forEach(([k,l])=>l.setStyle(sty(k)));if(cur&&LY[cur.key])LY[cur.key].bringToFront()}
 function legend(){const g={};Object.values(DB.p).forEach(p=>{const o=curOwner(p);if(!o)return;(g[o.name]??={n:0,a:0}).n++;g[o.name].a+=useArea(p)});
 const ks=Object.keys(g).sort((a,b)=>g[b].a-g[a].a),ta=ks.reduce((s,k)=>s+g[k].a,0),tn=ks.reduce((s,k)=>s+g[k].n,0);
@@ -120,5 +125,66 @@ $('#exp').onclick=()=>{const b=new Blob([JSON.stringify(DB)],{type:'application/
 $('#imp').onclick=()=>$('#fi').click();
 $('#fi').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.p)throw 0;if(!confirm('현재 데이터를 백업 파일 내용으로 바꿉니다. 계속할까요?'))return;DB={p:d.p,c:d.c||{}};cur=null;drawAll();side();fitAll();msg('불러왔습니다')}catch(x){msg('백업 파일 형식이 올바르지 않습니다',1)}e.target.value=''};
 function fitAll(){if(reg.getLayers().length)map.fitBounds(reg.getBounds(),{maxZoom:18,padding:[30,30]})}
+
+/* ===== 엑셀 일괄 등록 ===== */
+const ALI={addr:['주소','소재지','지번주소','토지소재지'],name:['권리자명','권리자','소유자','소유자명'],purpose:['등기목적','목적'],rdate:['접수일자','접수일'],rno:['접수번호'],cdate:['등기원인일자','원인일자'],ctype:['원인구분','등기원인','구분'],oaddr:['권리자주소','소유자주소'],reg:['등록번호','주민등록번호','법인등록번호'],note:['기타사항','기타','비고'],jm:['지목'],larea:['대장면적','면적']};
+const nk=s=>String(s).replace(/\s/g,'');
+const nd=v=>{if(v instanceof Date){const d=new Date(v.getTime()+432e5);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+const m=/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(String(v));return m?`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`:String(v??'')};
+const geo=async a=>{const g=await jsonp('https://api.vworld.kr/req/address?'+q({service:'address',request:'getCoord',version:'2.0',crs:'epsg:4326',address:a,refine:'true',simple:'false',format:'json',type:'PARCEL',key:KEY,domain:DOM}));
+if(g.response.status!=='OK')throw new Error('주소를 찾지 못함');return[+g.response.result.point.y,+g.response.result.point.x]};
+$('#xt').onclick=()=>{const h=['주소','권리자명','등기목적','접수일자','접수번호','등기원인일자','원인구분','권리자주소','등록번호','기타사항','지목','대장면적'];
+const ws=XLSX.utils.aoa_to_sheet([h,['경기도 광주시 탄벌동 214-4','(주)샘플','소유권이전','2021-08-10','12345','2021-07-30','매매','서울특별시 중구 …','110111-*******','','대',''],['경기도 광주시 탄벌동 214-4','(주)샘플2','소유권이전','2023-03-02','2345','2023-02-20','신탁','','','','','']]),wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,ws,'자산');XLSX.writeFile(wb,'자산등록양식.xlsx')};
+$('#xl').onclick=()=>$('#xf').click();
+$('#xf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+try{const wb=XLSX.read(await f.arrayBuffer(),{cellDates:true}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});if(!rows.length)throw new Error('데이터가 없습니다');
+const hd=Object.keys(rows[0]),H={};Object.entries(ALI).forEach(([k,al])=>{H[k]=hd.find(h=>al.includes(nk(h)))});
+if(!H.addr||!H.name)throw new Error('「주소」와 「권리자명」 열이 필요합니다. 현재 열: '+hd.join(', '));
+const v=(r,k)=>H[k]?r[H[k]]:'',gr={};rows.forEach(r=>{const a=String(v(r,'addr')).trim();if(a)(gr[a]??=[]).push(r)});
+const ad=Object.keys(gr),over=confirm(`${ad.length}개 주소를 등록합니다.\n이미 등록된 필지는 엑셀 내용으로 덮어쓸까요?\n확인=덮어쓰기 / 취소=건너뛰기`),bad=[];let n=0,ok=0;
+const one=async a=>{try{const[y,x]=await geo(a),f2=await fetchAt(y,x);if(!f2)throw new Error('해당 위치에 필지가 없음');const k=f2.properties.pnu;
+if(DB.p[k]&&curOwner(DB.p[k])&&!over){bad.push([a,'건너뜀(이미 등록)']);return}
+const rs=gr[a],pr=rs.find(r=>v(r,'jm')||v(r,'larea'))||{},m=/^(산?\d+(?:-\d+)?)(.*)$/.exec((f2.properties.jibun||'').replace(/\s/g,''));
+DB.p[k]={f:f2,jm:String(v(pr,'jm')||(m?m[2]:'')),larea:v(pr,'larea')||'',note:'',area:areaM2(f2.geometry),owners:rs.filter(r=>v(r,'name')).map(r=>({purpose:String(v(r,'purpose')||'소유권이전'),rdate:nd(v(r,'rdate')),rno:String(v(r,'rno')),cdate:nd(v(r,'cdate')),ctype:String(v(r,'ctype')),name:String(v(r,'name')).trim(),addr:String(v(r,'oaddr')),reg:String(v(r,'reg')),note:String(v(r,'note'))}))};ok++}
+catch(x){bad.push([a,x.message])}msg(`엑셀 등록 중… ${++n}/${ad.length}`)};
+const qu=[...ad];await Promise.all([0,1,2].map(async()=>{while(qu.length)await one(qu.shift())}));
+cur=null;drawAll();fitAll();msg(`완료: ${ok}필지 등록 · 실패/건너뜀 ${bad.length}건`,bad.length>0);
+$('#side').innerHTML=`<h3>엑셀 등록 결과</h3><p>등록 ${ok}필지 / 전체 ${ad.length}주소</p>`+(bad.length?`<h4>확인이 필요한 주소</h4>`+bad.map(b=>`<div class="er">${esc(b[0])}<br><span class="m">${esc(b[1])}</span></div>`).join('<hr>'):'')}
+catch(x){msg(x.message,1)}};
+/* ===== 지역 이동 ===== */
+const SIDO=[['서울특별시','11'],['부산광역시','26'],['대구광역시','27'],['인천광역시','28'],['광주광역시','29'],['대전광역시','30'],['울산광역시','31'],['세종특별자치시','36'],['경기도','41'],['강원특별자치도','51'],['충청북도','43'],['충청남도','44'],['전북특별자치도','52'],['전라남도','46'],['경상북도','47'],['경상남도','48'],['제주특별자치도','50']];
+const RG={open:{},kids:{},load:{},sel:''};let bnd=null;
+function rgOf(p){const t=(p.f.properties.addr||'').trim().split(/\s+/);let g=t[1]||'',i=2;if(/시$/.test(g)&&/구$/.test(t[i]||''))g+=' '+t[i++];return[t[0]||'',g,t[i]||'']}
+const rKey=(pk,n)=>(pk?pk+'|':'')+nk(n);
+function rgData(){const c={},cd={},A={};Object.values(DB.p).forEach(p=>{if(!curOwner(p))return;const pu=p.f.properties.pnu;let pk='';rgOf(p).forEach((n,i)=>{if(!n)return;const k=rKey(pk,n);c[k]=(c[k]||0)+1;cd[k]??=pu.slice(0,[2,5,8][i]);(A[pk]??={})[k]=n;pk=k})});return{c,cd,A}}
+async function loadKids(k,code,lv){if(RG.kids[k]||RG.load[k])return;RG.load[k]=1;
+try{const d=lv?'LT_C_ADEMD_INFO':'LT_C_ADSIGG_INFO',fl=lv?'emd_cd':'sig_cd';
+const r=await jsonp('https://api.vworld.kr/req/data?'+q({service:'data',request:'GetFeature',data:d,key:KEY,domain:DOM,format:'json',size:1000,page:1,geometry:'false',attribute:'true',attrFilter:`${fl}:like:${code}`}));
+if(r.response.status!=='OK')throw new Error(JSON.stringify(r.response.error||r.response.status));
+RG.kids[k]=r.response.result.featureCollection.features.map(x=>x.properties).filter(p=>String(p[fl]).startsWith(code)).map(p=>{const t=(p.full_nm||'').split(/\s+/);
+return{cd:p[fl],n:lv?(p.emd_kor_nm||t[t.length-1]):(t.slice(1).join(' ')||p.sig_kor_nm)}});
+if(!RG.kids[k].length)msg('하위 지역 목록이 비어 있습니다(지역 코드 확인 필요)',1)}
+catch(x){RG.kids[k]=[];msg('전체 지역 목록 불러오기 실패: '+x.message,1)}delete RG.load[k];rgRender()}
+function rgRender(){const{c,cd,A}=rgData(),out=[];
+const kids=(pk,lv)=>{const m=new Map();if(!lv)SIDO.forEach(([n,cc])=>m.set(rKey('',n),{n,cd:cc}));else(RG.kids[pk]||[]).forEach(o=>m.set(rKey(pk,o.n),o));
+Object.entries(A[pk]||{}).forEach(([k,n])=>{if(!m.has(k))m.set(k,{n,cd:cd[k]});else if(!m.get(k).cd)m.get(k).cd=cd[k]});
+return[...m.entries()].sort((a,b)=>(c[b[0]]||0)-(c[a[0]]||0)||a[1].n.localeCompare(b[1].n,'ko'))};
+const walk=(pk,lv)=>kids(pk,lv).forEach(([k,o])=>{const n=c[k]||0,op=RG.open[k];
+out.push(`<div class="rn ${n?'':'z'} ${RG.sel==k?'on':''}" data-rk="${esc(k)}" data-lv="${lv}" data-cd="${o.cd||''}" style="padding-left:${6+lv*12}px"><i>${lv==2?'':op?'▾':'▸'}</i><span>${esc(o.n)}</span>${n?`<b>${n}</b>`:''}</div>`);
+if(op&&lv<2)walk(k,lv+1)});walk('',0);$('#rg').innerHTML=out.join('')}
+async function goRegion(k,lv,code){if(bnd){bnd.remove();bnd=null}
+const ks=Object.entries(LY).filter(([pk])=>{const t=rgOf(DB.p[pk]);let a='';const ch=t.map(n=>a=rKey(a.length?a:'',n));return ch[lv]==k}).map(x=>x[1]);
+if(ks.length){map.fitBounds(L.featureGroup(ks).getBounds(),{maxZoom:18,padding:[30,30]});return}
+if(lv<2){msg('이 지역에는 등록된 자산이 없습니다. 아래 단계(시군구·읍면동)를 펼쳐 선택하세요.');return}
+$('#add').checked=true;cur=null;
+$('#side').innerHTML='<h3>등록된 자산이 없는 지역</h3><p class="m">필지 추가 모드를 켰습니다. 지도에서 필지를 클릭해 소유자 정보를 입력하거나, 「엑셀 일괄 등록」으로 한 번에 등록하세요.</p>';
+if(!code)return msg('지역 코드를 알 수 없어 지도를 이동하지 못했습니다',1);msg('지역 경계 조회 중…');
+try{const r=await jsonp('https://api.vworld.kr/req/data?'+q({service:'data',request:'GetFeature',data:'LT_C_ADEMD_INFO',key:KEY,domain:DOM,format:'json',size:10,page:1,geometry:'true',attribute:'true',crs:'EPSG:4326',attrFilter:'emd_cd:=:'+code}));
+if(r.response.status!=='OK')throw new Error('경계 조회 실패 '+(r.response.status));bnd=L.geoJSON(r.response.result.featureCollection,{style:{color:'#888',weight:2,dashArray:'6',fill:false},interactive:false}).addTo(map);map.fitBounds(bnd.getBounds());msg('')}
+catch(x){msg(x.message,1)}}
+document.addEventListener('click',e=>{const r=e.target.closest('.rn');if(!r)return;const k=r.dataset.rk,lv=+r.dataset.lv,cdv=r.dataset.cd;RG.sel=k;
+if(lv<2){RG.open[k]=!RG.open[k];if(RG.open[k]&&cdv)loadKids(k,cdv,lv)}goRegion(k,lv,cdv);rgRender()});
+
 drawAll();side();fitAll();
 </script></body></html>
