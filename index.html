@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>보유 부동산 GIS 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceee8;--pn:#fbfbf8;--ink:#22302a;--mut:#667068;--ln:#cdd3c8;--ac:#b3601a;--sel:#f3d9b8;--pc:#dfe6d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171c19;--pn:#202723;--ink:#e4e9e2;--mut:#98a39a;--ln:#38423b;--ac:#e2944f;--sel:#5a3c1d;--pc:#2c372f}}
+:root[data-theme="dark"]{--bg:#171c19;--pn:#202723;--ink:#e4e9e2;--mut:#98a39a;--ln:#38423b;--ac:#e2944f;--sel:#5a3c1d;--pc:#2c372f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'Noto Sans KR',system-ui,sans-serif}
+button{font:inherit;cursor:pointer;border:1px solid var(--ln);background:var(--pn);color:var(--ink);padding:5px 10px;border-radius:4px}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac)}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:4px 6px;width:100%;min-width:0}
+#gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9}
+#gate form,#gate div.b{background:var(--pn);border:1px solid var(--ln);padding:28px;width:min(340px,90%)}
+#gate h1{font-size:18px;margin:0 0 4px}#gate p{color:var(--mut);margin:0 0 14px;font-size:13px}
+header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--ln);background:var(--pn)}
+header b{font-size:16px}
+main{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:12px;padding:12px;max-width:1300px;margin:auto}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.pn{background:var(--pn);border:1px solid var(--ln);padding:12px;min-width:0}
+svg#map{width:100%;background:var(--pc);border:1px solid var(--ln);display:block}
+svg .pc{fill:var(--pn);stroke:var(--mut);stroke-width:1;cursor:pointer}svg .pc.on{fill:var(--sel);stroke:var(--ac);stroke-width:2}
+svg text{font-size:10px;fill:var(--ink);pointer-events:none}
+.road{fill:none;stroke:var(--ln);stroke-width:10}
+.tools{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}.tools label{display:flex;gap:4px;align-items:center}.tools input{width:auto}
+.list{max-height:220px;overflow:auto;border-top:1px solid var(--ln)}
+.list div{padding:6px 4px;border-bottom:1px solid var(--ln);cursor:pointer;display:flex;justify-content:space-between;gap:8px}.list div.on{background:var(--sel)}
+.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:2px solid var(--ln);margin-bottom:12px}
+.tabs button{border:0;border-radius:0;background:none;color:var(--mut);white-space:nowrap}.tabs button.on{color:var(--ink);font-weight:700;box-shadow:inset 0 -3px var(--ac)}
+h3{font-size:14px;margin:16px 0 6px}h2{font-size:17px;margin:0 0 2px}.m{color:var(--mut);font-size:12px}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}.g label{display:block;font-size:12px;color:var(--mut)}
+.tw{overflow-x:auto;margin-top:4px}table{border-collapse:collapse;width:100%;min-width:560px}th,td{border:1px solid var(--ln);padding:2px;text-align:left}th{font-size:12px;font-weight:500;background:var(--bg);padding:4px}
+td input{border:0;background:transparent}td.n{padding:4px 8px;text-align:right;white-space:nowrap}.x{padding:1px 7px}
+.sum{display:flex;justify-content:space-between;padding:6px 8px;background:var(--bg);margin-top:4px}.sum b{color:var(--ac)}
+</style></head><body>
+<div id="gate"><form id="gf"><h1>보유 부동산 관리</h1><p>접속코드를 입력하세요.</p><input id="code" type="password" autocomplete="off" aria-label="접속코드"><p id="err" style="color:#c0392b;margin:6px 0"></p><button class="p" style="width:100%">접속</button></form></div>
+<header><b>보유 부동산 GIS</b><span><button id="th">화면 모드</button> <button id="out">나가기</button></span></header>
+<main><section class="pn"><svg id="map" viewBox="0 0 400 300" role="img" aria-label="필지 지적도(샘플)"></svg>
+<div class="tools"><label><input type="checkbox" id="mm">여러 필지 선택</label><button id="mk" class="p">선택 필지로 개발그룹 만들기</button></div>
+<div class="list" id="list"></div><p class="m">지도는 샘플 도형입니다. 실제 서비스는 VWorld 지적도 위에 올립니다.</p></section>
+<section class="pn" id="det"></section></main>
+<script>
+const CODE='ESTATE2026'; // 시연용. 실제 서비스는 서버에서 검증
+const POLY={a:'20,20 130,20 130,110 20,110',b:'130,20 250,20 250,110 130,110',c:'250,20 380,20 380,110 250,110',d:'20,140 150,140 150,280 20,280',e:'150,140 290,140 290,280 150,280',f:'290,140 380,140 380,280 290,280'};
+const mkP=(id,addr,area,jm,zone,bcr,far)=>({id,addr,area,jm,lat:'',lng:'',history:[{date:'2018-03-12',jm:'전',area:area+120,reason:'분할'},{date:'2021-07-01',jm:jm,area:area,reason:'지목변경'}],use:zone,dist:'지구단위계획구역 외',bcr,far,etc:'',prices:[{year:'2024',price:'',date:'2024-05-31'},{year:'2025',price:'',date:'2025-05-30'}],base:'01월',owners:[{purpose:'소유권이전',rdate:'2021-08-10',rno:'12345',cdate:'2021-07-30',ctype:'매매',name:'(주)샘플',addr:'서울특별시 중구 ...',reg:'110111-*******',note:''}]});
+const D0={parcels:[mkP('a','경기도 광주시 도척면 노곡리 101',1650,'대','계획관리지역',40,100),mkP('b','경기도 광주시 도척면 노곡리 102',2310,'대','계획관리지역',40,100),mkP('c','경기도 광주시 도척면 노곡리 103-1',980,'잡종지','계획관리지역',40,100),mkP('d','경기도 광주시 도척면 노곡리 205',3420,'임야','보전관리지역',20,80),mkP('e','경기도 광주시 도척면 노곡리 206',1870,'전','생산관리지역',20,80),mkP('f','경기도 광주시 도척면 노곡리 207',2540,'답','농림지역',20,80)],projects:[]};
+let S;try{S=JSON.parse(localStorage.getItem('re1'))}catch(e){}S=S||D0;
+let sel=['a'],act='a',tab='land',pj=null;
+const $=s=>document.querySelector(s);
+const save=()=>{try{localStorage.setItem('re1',JSON.stringify(S))}catch(e){}};
+const get=p=>p.split('.').reduce((o,k)=>o==null?o:o[k],S);
+const set=(p,v)=>{const k=p.split('.'),l=k.pop();k.reduce((o,x)=>o[x],S)[l]=v};
+const num=v=>parseFloat(String(v).replace(/,/g,''))||0,won=n=>Math.round(n).toLocaleString('ko-KR')+'원';
+const F=(l,p,t='text')=>`<label>${l}<input data-p="${p}" type="${t}" value="${get(p)??''}"></label>`;
+function T(path,cols,tot){const rows=get(path)||[];return `<div class="tw"><table><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}${tot?'<th>합계</th>':''}<th></th></tr>`+rows.map((r,i)=>`<tr>${cols.map(c=>`<td><input data-p="${path}.${i}.${c[0]}" type="${c[2]||'text'}" value="${r[c[0]]??''}"></td>`).join('')}${tot?`<td class="n" data-tot="${path}.${i}"></td>`:''}<td><button class="x" data-del="${path}.${i}" aria-label="행 삭제">×</button></td></tr>`).join('')+`</table></div><button data-add="${path}">+ 행 추가</button>`}
+const NEW={history:{date:'',jm:'',area:'',reason:''},prices:{year:'',price:'',date:''},owners:{purpose:'소유권이전',rdate:'',rno:'',cdate:'',ctype:'매매',name:'',addr:'',reg:'',note:''},extra:{addr:'',area:'',jm:'',cost:''},permit:{kind:'',cdate:'',vendor:'',dep:'',prog:'',sched:''},cons:{kind:'',cdate:'',vendor:'',dep:'',prog:'',sched:''},taxes:{name:'',amt:''}};
+const P=()=>S.parcels.find(p=>p.id===act),pi=()=>S.parcels.findIndex(p=>p.id===act);
+function map(){$('#map').innerHTML='<path class="road" d="M0,125 H400 M265,0 V125"/>'+S.parcels.map(p=>{const pts=POLY[p.id]?.split(' ')[0].split(',')||[0,0],q=POLY[p.id].split(' ');const x=(+q[0].split(',')[0]+ +q[2].split(',')[0])/2,y=(+q[0].split(',')[1]+ +q[2].split(',')[1])/2;return `<polygon class="pc ${sel.includes(p.id)?'on':''}" data-id="${p.id}" points="${POLY[p.id]}"/><text x="${x}" y="${y}" text-anchor="middle">${p.addr.split(' ').pop()}</text><text x="${x}" y="${y+12}" text-anchor="middle">${p.jm} ${p.area}㎡</text>`}).join('')}
+function list(){$('#list').innerHTML=S.parcels.map(p=>`<div data-id="${p.id}" class="${sel.includes(p.id)?'on':''}"><span>${p.addr.replace('경기도 광주시 ','')}</span><span class="m">${p.jm} · ${p.area}㎡</span></div>`).join('')}
+function sumPlan(pr){const L=get(`projects.${pr}.extra`)||[],ex=num(get(`projects.${pr}.held`)),ad=L.reduce((s,r)=>s+num(r.cost),0),pm=(get(`projects.${pr}.permit`)||[]).reduce((s,r)=>s+num(r.dep)+num(r.prog),0),cs=(get(`projects.${pr}.cons`)||[]).reduce((s,r)=>s+num(r.dep)+num(r.prog),0),tx=(get(`projects.${pr}.taxes`)||[]).reduce((s,r)=>s+num(r.amt),0);return{ex,ad,pm,cs,tx,all:ex+ad+pm+cs+tx}}
+function dev(){const mine=S.projects.map((p,i)=>[p,i]).filter(([p])=>p.ids.includes(act));if(!mine.length)return `<p>이 필지는 속한 개발그룹이 없습니다. 지도에서 필지를 여러 개 선택한 뒤 <b>선택 필지로 개발그룹 만들기</b>를 누르세요.</p>`;
+if(pj==null||!S.projects[pj]||!S.projects[pj].ids.includes(act))pj=mine[0][1];const b=`projects.${pj}`,p=S.projects[pj];
+return `<div class="tools"><select id="pjs" style="width:auto">${mine.map(([q,i])=>`<option value="${i}" ${i==pj?'selected':''}>${q.name||'(이름 없음)'}</option>`).join('')}</select><button data-delpj="${pj}">그룹 삭제</button></div>
+<p class="m">포함 필지: ${p.ids.map(i=>S.parcels.find(x=>x.id===i).addr.split(' ').pop()).join(', ')}</p>
+<div class="g">${F('개발구역명칭',b+'.name')}${F('사업시행자',b+'.op')}${F('사업유형',b+'.type')}${F('용도',b+'.usage')}${F('건축면적(㎡)',b+'.barea')}${F('연면적(㎡)',b+'.garea')}</div>
+<h3>층별면적</h3>${T(b+'.floors',[['f','층'],['a','면적(㎡)','number']])}
+<h3>사업일정</h3><div class="g">${F('인허가접수일',b+'.s1','date')}${F('인허가종료일',b+'.s2','date')}${F('착공일',b+'.s3','date')}${F('착공종료일',b+'.s4','date')}${F('준공접수일',b+'.s5','date')}${F('준공완료일',b+'.s6','date')}</div>
+<h3>토지비용</h3><div class="g">${F('기존 보유비용(원)',b+'.held','number')}</div><p class="m">추가 매입 필요 토지</p>${T(b+'.extra',[['addr','소재지'],['area','면적(㎡)','number'],['jm','지목'],['cost','매입비용(원)','number']])}
+<h3>인허가비용</h3>${T(b+'.permit',[['kind','항목'],['cdate','계약일자','date'],['vendor','업체'],['dep','계약금','number'],['prog','기성금','number'],['sched','지급일정']],1)}
+<h3>착공비용</h3>${T(b+'.cons',[['kind','항목'],['cdate','계약일자','date'],['vendor','업체'],['dep','계약금','number'],['prog','기성금','number'],['sched','지급일정']],1)}
+<h3>예상 세금</h3>${T(b+'.taxes',[['name','항목'],['amt','금액(원)','number']])}
+<h3>사업비 요약</h3><div id="sum"></div>`}
+function view(){const p=P(),b='parcels.'+pi();let h=`<h2>${p.addr}</h2><div class="m">${p.jm} · ${p.area.toLocaleString()}㎡ (${(p.area*.3025).toFixed(1)}평)</div><div class="tabs">${[['land','토지정보'],['plan','도시계획'],['price','공시지가'],['own','소유권'],['dev','개발계획']].map(([k,l])=>`<button data-tab="${k}" class="${tab==k?'on':''}">${l}</button>`).join('')}</div>`;
+if(tab=='land')h+=`<div class="g">${F('위치(지번주소)',b+'.addr')}${F('면적(㎡)',b+'.area','number')}${F('지목',b+'.jm')}${F('위도',b+'.lat')}${F('경도',b+'.lng')}</div><p class="m">평 환산: ${(p.area*.3025).toFixed(2)}평</p><h3>토지이동연혁</h3>${T(b+'.history',[['date','일자','date'],['jm','지목'],['area','면적(㎡)','number'],['reason','토지이동사유']])}`;
+if(tab=='plan')h+=`<div class="g">${F('용도지역',b+'.use')}${F('용도지구',b+'.dist')}${F('건폐율(%)',b+'.bcr','number')}${F('용적률(%)',b+'.far','number')}</div><h3>기타 도시계획 제한 및 규정사항</h3><label><input data-p="${b}.etc" value="${p.etc}" placeholder="예: 성장관리계획구역, 개발행위허가 제한 등"></label>`;
+if(tab=='price')h+=`<div class="g">${F('기준년월(월)',b+'.base')}</div><h3>연도별 개별공시지가</h3>${T(b+'.prices',[['year','기준연도'],['price','공시지가(원/㎡)','number'],['date','공시일자','date']])}`;
+if(tab=='own')h+=`<h3>소유권 이전 현황</h3>${T(b+'.owners',[['purpose','등기목적'],['rdate','접수일자','date'],['rno','접수번호'],['cdate','등기원인일자','date'],['ctype','원인구분(매매·신탁 등)'],['name','권리자명'],['addr','주소'],['reg','등록번호'],['note','기타사항']])}`;
+if(tab=='dev')h+=dev();$('#det').innerHTML=h;updSum()}
+function updSum(){document.querySelectorAll('[data-tot]').forEach(e=>{const r=get(e.dataset.tot);e.textContent=won(num(r.dep)+num(r.prog))});const s=$('#sum');if(s&&pj!=null&&S.projects[pj]){const q=sumPlan(pj);s.innerHTML=[['기존 보유 토지',q.ex],['추가 매입 토지',q.ad],['인허가비용',q.pm],['착공비용',q.cs],['예상 세금',q.tx]].map(([l,v])=>`<div class="sum"><span>${l}</span><span>${won(v)}</span></div>`).join('')+`<div class="sum"><span>총 사업비</span><b>${won(q.all)}</b></div>`}}
+function all(){map();list();view()}
+document.addEventListener('input',e=>{const p=e.target.dataset.p;if(!p)return;set(p,e.target.type=='number'?e.target.value:e.target.value);save();updSum();if(/\.(area|jm|addr)$/.test(p)&&p.split('.').length==3){map();list();document.querySelector('#det h2').textContent=P().addr}});
+document.addEventListener('click',e=>{const t=e.target,d=t.closest('[data-id]');
+if(d&&d.closest('#map,#list')){const id=d.dataset.id;if($('#mm').checked){sel=sel.includes(id)?sel.filter(x=>x!=id):[...sel,id];if(!sel.length)sel=[id]}else sel=[id];act=id;all();return}
+if(t.dataset.tab){tab=t.dataset.tab;view();document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab==tab));return}
+if(t.dataset.add){const k=t.dataset.add,arr=get(k),n=k.split('.').pop();arr.push({...NEW[n]});save();view();return}
+if(t.dataset.del){const k=t.dataset.del.split('.'),i=+k.pop();get(k.join('.')).splice(i,1);save();view();return}
+if(t.dataset.delpj){if(confirm('개발그룹을 삭제할까요?')){S.projects.splice(+t.dataset.delpj,1);pj=null;save();view()}return}
+if(t.id=='mk'){if(!sel.length)return;S.projects.push({name:'새 개발구역',op:'',type:'',usage:'',barea:'',garea:'',floors:[{f:'1층',a:''}],s1:'',s2:'',s3:'',s4:'',s5:'',s6:'',held:'',extra:[],ids:[...sel],permit:['건축설계','개발행위','재해영향평가','문화재조사','환경영향평가','기타'].map(k=>({...NEW.permit,kind:k})),cons:[{...NEW.cons,kind:'공사비'}],taxes:['농지전용부담금','대체산지조성비','개발부담금'].map(n=>({name:n,amt:''}))});pj=S.projects.length-1;tab='dev';save();view()}});
+document.addEventListener('change',e=>{if(e.target.id=='pjs'){pj=+e.target.value;view()}});
+$('#th').onclick=()=>{const r=document.documentElement,dk=matchMedia('(prefers-color-scheme:dark)').matches;const cur=r.dataset.theme||(dk?'dark':'light');r.dataset.theme=cur=='dark'?'light':'dark'};
+$('#gf').onsubmit=e=>{e.preventDefault();if($('#code').value===CODE){$('#gate').style.display='none';try{sessionStorage.setItem('ok','1')}catch(x){}}else $('#err').textContent='접속코드가 맞지 않습니다.'};
+$('#out').onclick=()=>{try{sessionStorage.removeItem('ok')}catch(x){}$('#gate').style.display='flex';$('#code').value=''};
+try{if(sessionStorage.getItem('ok'))$('#gate').style.display='none'}catch(x){}
+all();
+</script></body></html>
