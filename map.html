@@ -10,49 +10,75 @@
 @media(prefers-color-scheme:dark){:root{--bg:#171c19;--pn:#202723;--ink:#e4e9e2;--mut:#98a39a;--ln:#38423b;--ac:#e2944f}}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--ink);font:13px/1.5 'Noto Sans KR',system-ui,sans-serif}
-#app{display:grid;height:100%;grid-template-columns:3fr 1fr;grid-template-rows:3fr 1fr;gap:1px;background:var(--ln)}
+#app{display:grid;height:100%;grid-template-columns:1fr 8px var(--rw,340px);grid-template-rows:1fr 8px var(--lh,170px)}
 #mapcell{grid-area:1/1;display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--pn)}
-#legend{grid-area:2/1;overflow:auto;padding:8px 12px;background:var(--pn);min-height:0}
-#side{grid-area:1/2/3/3;overflow:auto;padding:12px;background:var(--pn);min-width:0}
-@media(max-width:860px){#app{display:block;height:auto}#mapcell{height:62vh}#side,#legend{border-top:1px solid var(--ln)}}
+#sp2{grid-area:2/1;cursor:row-resize}#sp1{grid-area:1/2/4/3;cursor:col-resize}
+#legend{grid-area:3/1;overflow:auto;padding:8px 12px;background:var(--pn);min-height:0}
+#side{grid-area:1/3/4/4;overflow:auto;padding:12px;background:var(--pn);min-width:0}
+.sp{background:var(--ln);touch-action:none}.sp:hover{background:var(--ac)}
+@media(max-width:860px){#app{display:block;height:auto}.sp{display:none}#mapcell{height:62vh}#side,#legend{border-top:1px solid var(--ln)}}
 #bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:6px 8px;border-bottom:1px solid var(--ln)}
-#bar input[type=text]{flex:1;min-width:160px}#map{flex:1;min-height:0}
+#bar input[type=text]{flex:1;min-width:150px}#mw{flex:1;display:flex;min-height:0}#map{flex:1;min-height:0;min-width:0}
+#rg{width:200px;overflow:auto;border-right:1px solid var(--ln);padding:4px 0;font-size:12px;flex:none}
+@media(max-width:860px){#mw{flex-direction:column}#rg{width:auto;max-height:24vh;border-right:0;border-bottom:1px solid var(--ln)}}
 input,button,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:4px 7px;min-width:0}
 button{cursor:pointer;background:var(--pn)}button.p{background:var(--ac);border-color:var(--ac);color:#fff}
 input[type=color]{padding:0;width:26px;height:22px;border:0;background:none}input[type=checkbox]{width:auto}
 h3{margin:0 0 4px;font-size:14px}h4{margin:14px 0 4px;font-size:13px;border-bottom:1px solid var(--ln);padding-bottom:2px}
 .m{color:var(--mut);font-size:12px}.er{color:#c0392b}
-dl{display:grid;grid-template-columns:78px 1fr;gap:3px 8px;margin:4px 0;align-items:center}dt{color:var(--mut)}dd{margin:0;word-break:break-all}dd input{width:100%}
-.cc{border:2px solid var(--ln);padding:8px;border-radius:4px}.cc b{font-size:15px}
+dl{display:grid;grid-template-columns:76px 1fr;gap:3px 8px;margin:4px 0;align-items:center}dt{color:var(--mut)}dd{margin:0;word-break:break-all}dd input{width:100%}
+.cc{border:2px solid var(--ln);padding:8px;border-radius:4px}.cc b{font-size:15px}.cc dl{margin:2px 0 0}
+.tabs{display:flex;overflow-x:auto;border-bottom:2px solid var(--ln);margin:10px 0}.tabs button{border:0;border-radius:0;background:none;color:var(--mut);white-space:nowrap}.tabs button.on{color:var(--ink);font-weight:700;box-shadow:inset 0 -3px var(--ac)}
 fieldset{border:1px solid var(--ln);border-radius:4px;margin:6px 0;padding:6px}legend{font-size:12px;color:var(--mut)}
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:4px}.fg label{font-size:11px;color:var(--mut)}.fg input{width:100%}.fg .w{grid-column:1/-1}
-.act{display:flex;gap:6px;margin-top:10px;position:sticky;bottom:0;background:var(--pn);padding:6px 0}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:4px}.fg label,.g label{font-size:11px;color:var(--mut);display:block}.fg input,.g input{width:100%}.fg .w{grid-column:1/-1}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.tw{overflow-x:auto;margin:4px 0}table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--ln);padding:1px}th{font-size:11px;font-weight:500;background:var(--bg);padding:3px;white-space:nowrap}
+td input{border:0;background:transparent;width:100%;min-width:72px}td.n{padding:2px 6px;text-align:right;white-space:nowrap}.x{padding:0 6px}
+.sm{display:flex;justify-content:space-between;padding:4px 8px;background:var(--bg);margin-top:3px}.sm b{color:var(--ac)}
+.act{display:flex;gap:6px;margin-top:10px;position:sticky;bottom:-12px;background:var(--pn);padding:8px 0}
 #lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 10px}
 .li{display:flex;align-items:center;gap:6px;cursor:pointer}.li span:nth-child(2){flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .jl{background:none;border:0;box-shadow:none;font-size:11px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;display:none}.jl:before{display:none}.lab .jl{display:block}
-#mw{flex:1;display:flex;min-height:0}#rg{width:210px;overflow:auto;border-right:1px solid var(--ln);padding:4px 0;font-size:12px;flex:none}
-@media(max-width:860px){#mw{flex-direction:column}#rg{width:auto;max-height:24vh;border-right:0;border-bottom:1px solid var(--ln)}}
 .rn{display:flex;gap:4px;padding:3px 6px;cursor:pointer;align-items:center}.rn:hover{background:var(--bg)}.rn i{width:10px;font-style:normal;color:var(--mut)}.rn span{flex:1}
 .rn b{background:var(--ac);color:#fff;border-radius:9px;padding:0 6px;font-size:11px;font-weight:400}.rn.z{color:var(--mut);opacity:.6}.rn.on{outline:1px solid var(--ac)}
+#gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}#gate[hidden]{display:none}
+#gate form{background:var(--pn);border:1px solid var(--ln);padding:24px;width:min(340px,90%);display:flex;flex-direction:column;gap:10px}
 </style></head><body>
+<div id="gate" hidden><form id="gf"><h3>보유 부동산 지도</h3><span class="m">접속코드를 입력하세요.</span><input type="password" id="code" autocomplete="current-password" aria-label="접속코드"><label class="m"><input type="checkbox" id="rmb" checked> 이 기기에서 기억</label><span id="ge" class="er"></span><button class="p">접속</button></form></div>
 <div id="app">
 <section id="mapcell"><div id="bar">
 <input type="text" id="adr" value="경기도 광주시 탄벌동 214-4" aria-label="주소">
 <button id="fnd">주소로 필지 찾기</button>
-<label><input type="checkbox" id="add"> 필지 추가 모드</label>
-<button id="xl">엑셀 일괄 등록</button><button id="xt">양식 받기</button><input type="file" id="xf" accept=".xlsx,.xls,.csv" hidden><button id="exp">백업 저장</button><button id="imp">백업 불러오기</button><input type="file" id="fi" accept=".json" hidden>
+<label><input type="checkbox" id="add"> 필지 추가</label><label><input type="checkbox" id="mm"> 여러 필지 선택</label>
+<button id="xl">엑셀 일괄 등록</button><button id="xt">양식 받기</button><input type="file" id="xf" accept=".xlsx,.xls" hidden>
+<button id="exp">백업</button><button id="sy" hidden>동기화</button><button id="lo" hidden>나가기</button><button id="tp" title="우측 패널 접기/펼치기">◧</button>
 <span id="msg" class="m"></span></div><div id="mw"><div id="rg"></div><div id="map"></div></div></section>
+<div id="sp2" class="sp" title="드래그: 높이 조절 · 더블클릭: 초기화"></div><div id="sp1" class="sp" title="드래그: 너비 조절 · 더블클릭: 초기화"></div>
 <section id="legend"><h3>범례 <span class="m" id="tot"></span></h3><div id="lg"></div></section>
 <aside id="side"></aside>
 </div>
 <script>
+/* ===== 설정: Supabase를 만든 뒤 아래 두 값을 채우면 서버 저장(모든 기기 공유)이 켜집니다 ===== */
+const SB={url:'',key:''};
 const KEY='48B105CA-7F59-416B-B845-479BD1FF7B3B',DOM='haneulkim-wonsang.github.io';
+const ON=!!(SB.url&&SB.key);
 const PAL=['#e6194b','#3cb44b','#4363d8','#f58231','#911eb4','#46f0f0','#f032e6','#bcf60c','#008080','#9a6324','#800000','#808000','#000075','#ff69b4'];
 const $=s=>document.querySelector(s),q=o=>Object.entries(o).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmt=n=>Math.round(n).toLocaleString('ko-KR'),msg=(m,e)=>{$('#msg').textContent=m;$('#msg').className=e?'er':'m'};
-let DB;try{DB=JSON.parse(localStorage.getItem('re_map1'))}catch(e){}DB=DB||{p:{},c:{}};
-const save=()=>{try{localStorage.setItem('re_map1',JSON.stringify(DB))}catch(e){msg('저장 실패: 브라우저 저장 공간을 확인하세요',1)}};
+const fmt=n=>Math.round(n).toLocaleString('ko-KR'),num=v=>parseFloat(String(v).replace(/,/g,''))||0,won=n=>fmt(n)+'원',clone=o=>JSON.parse(JSON.stringify(o));
+const msg=(m,e)=>{$('#msg').textContent=m;$('#msg').className=e?'er':'m'},nk=s=>String(s).replace(/\s/g,'');
+/* ----- 저장소: 서버(Supabase) 또는 이 브라우저 ----- */
+let DB={p:{},c:{},j:{}},CODE='',chain=Promise.resolve();
+async function rpc(fn,body){const r=await fetch(SB.url+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+SB.key,'Content-Type':'application/json'},body:JSON.stringify(body)});
+const t=await r.text();if(!r.ok){let m='';try{m=JSON.parse(t).message}catch(e){}throw new Error(/bad code/.test(m)?'접속코드가 맞지 않습니다':'서버 오류 '+r.status+' '+m)}return t?JSON.parse(t):null}
+function put(items){if(!ON){try{localStorage.setItem('re_map2',JSON.stringify(DB))}catch(e){msg('저장 실패: 브라우저 저장 공간 부족',1)}return}
+chain=chain.then(async()=>{for(let i=0;i<items.length;i+=40)await rpc('kv_put',{c:CODE,items:items.slice(i,i+40)});msg('서버에 저장했습니다')}).catch(e=>msg('서버 저장 실패: '+e.message,1))}
+function del(ks){if(!ON)return put();chain=chain.then(()=>rpc('kv_del',{c:CODE,ks})).catch(e=>msg('서버 삭제 실패: '+e.message,1))}
+const pc=()=>({k:'c',v:DB.c});
+function fromRows(rows){DB={p:{},c:{},j:{}};rows.forEach(r=>{if(r.k=='c')DB.c=r.v;else if(r.k[0]=='p')DB.p[r.k.slice(2)]=r.v;else if(r.k[0]=='j')DB.j[r.k.slice(2)]=r.v})}
+async function login(code,rem){const rows=await rpc('kv_list',{c:code});CODE=code;fromRows(rows);
+try{(rem?localStorage:sessionStorage).setItem('re_code',code)}catch(e){}return rows.length}
+/* ----- 지도 ----- */
 let jc=0;
 function jsonp(url){return new Promise((ok,no)=>{const n='__vw'+(++jc),s=document.createElement('script');
 const cl=()=>{clearTimeout(t);delete window[n];s.remove()},t=setTimeout(()=>{cl();no(new Error('응답 시간 초과'))},20000);
@@ -62,8 +88,8 @@ const base=tl('Base','png'),sat=tl('Satellite','jpeg'),hyb=tl('Hybrid','png');
 const wms=L.tileLayer.wms('https://api.vworld.kr/req/wms',{layers:'lp_pa_cbnd_bubun',styles:'lp_pa_cbnd_bubun_line',format:'image/png',transparent:true,version:'1.3.0',key:KEY,domain:DOM,maxZoom:20});
 const map=L.map('map',{layers:[base],center:[37.4229,127.2429],zoom:17});
 L.control.layers({'일반지도':base,'위성지도':sat},{'지명(위성용)':hyb,'지적선(참고)':wms}).addTo(map);
-map.on('zoomend',()=>map.getContainer().classList.toggle('lab',map.getZoom()>=18));addEventListener('resize',()=>map.invalidateSize());
-const reg=L.featureGroup().addTo(map);let LY={},cur=null,tmpL=null;
+map.on('zoomend',()=>map.getContainer().classList.toggle('lab',map.getZoom()>=18));
+const reg=L.featureGroup().addTo(map);let LY={},cur=null,pj=null,tmpL=null,tab='land';const msel=new Set();
 const NR=()=>({purpose:'소유권이전',rdate:'',rno:'',cdate:'',ctype:'',name:'',addr:'',reg:'',note:''});
 function areaM2(g){const rings=g.type=='Polygon'?[g.coordinates]:g.coordinates,lat0=rings[0][0][0][1],kx=111320*Math.cos(lat0*Math.PI/180),ky=110540;
 const sh=r=>{let s=0;for(let i=0;i<r.length-1;i++)s+=r[i][0]*kx*r[i+1][1]*ky-r[i+1][0]*kx*r[i][1]*ky;return Math.abs(s)/2};
@@ -74,83 +100,121 @@ function curOwner(p){const r=(p.owners||[]).map((o,i)=>[o,i]).filter(x=>x[0].nam
 return r.sort((a,b)=>(b[0].rdate||'').localeCompare(a[0].rdate||'')||b[1]-a[1])[0][0]}
 const colorOf=n=>DB.c[n]||(DB.c[n]=PAL[Object.keys(DB.c).length%PAL.length]);
 const useArea=p=>+p.larea||p.area||0;
-function sty(k){const o=curOwner(DB.p[k]),s=cur&&cur.key==k;return{color:s?'#000':'#222',weight:s?4:1.5,fillColor:colorOf(o.name),fillOpacity:.6}}
+function sty(k){const o=curOwner(DB.p[k]),s=cur&&cur.key==k,m=msel.has(k);return{color:s?'#000':m?'#0066ff':'#222',weight:s?4:m?4:1.5,dashArray:m&&!s?'5':null,fillColor:colorOf(o.name),fillOpacity:.6}}
 function drawAll(){reg.clearLayers();LY={};Object.entries(DB.p).forEach(([k,p])=>{if(!curOwner(p))return;
 const ly=L.geoJSON(p.f,{style:sty(k)}).addTo(reg);ly.eachLayer(l=>l.options.bubblingMouseEvents=false);
-ly.bindTooltip(p.f.properties.jibun||'',{permanent:true,direction:'center',className:'jl'});ly.on('click',()=>selReg(k));LY[k]=ly});save();legend();rgRender()}
+ly.bindTooltip(p.f.properties.jibun||'',{permanent:true,direction:'center',className:'jl'});ly.on('click',()=>selReg(k));LY[k]=ly});legend();rgRender()}
 function restyle(){Object.entries(LY).forEach(([k,l])=>l.setStyle(sty(k)));if(cur&&LY[cur.key])LY[cur.key].bringToFront()}
 function legend(){const g={};Object.values(DB.p).forEach(p=>{const o=curOwner(p);if(!o)return;(g[o.name]??={n:0,a:0}).n++;g[o.name].a+=useArea(p)});
 const ks=Object.keys(g).sort((a,b)=>g[b].a-g[a].a),ta=ks.reduce((s,k)=>s+g[k].a,0),tn=ks.reduce((s,k)=>s+g[k].n,0);
 $('#tot').textContent=tn?`전체 ${tn}필지 · ${fmt(ta)}㎡ (${fmt(ta*.3025)}평)`:'';
 $('#lg').innerHTML=ks.length?ks.map(k=>`<div class="li" data-own="${esc(k)}"><input type="color" data-c="${esc(k)}" value="${colorOf(k)}" aria-label="${esc(k)} 색상"><span>${esc(k)}</span><span class="m">${g[k].n}필지 · ${fmt(g[k].a)}㎡</span></div>`).join(''):'<span class="m">등록된 필지가 없습니다. 소유자 정보를 저장한 필지가 여기에 표시됩니다.</span>'}
 function clearTmp(){if(tmpL){tmpL.remove();tmpL=null}}
-function selReg(k){clearTmp();cur={key:k,reg:true,d:JSON.parse(JSON.stringify(DB.p[k]))};restyle();side()}
+const fixD=d=>{d.hist??=[];d.zone??={use:'',dist:'',bcr:'',far:'',etc:''};d.pbase??='';d.prices??=[];d.owners??=[];return d};
+function selReg(k,nt){clearTmp();if($('#mm').checked&&!nt){msel.has(k)?msel.delete(k):msel.add(k)}cur={key:k,reg:true,d:fixD(clone(DB.p[k]))};pj=null;restyle();side()}
 function selNew(f){const k=f.properties.pnu;if(DB.p[k]&&curOwner(DB.p[k]))return selReg(k);clearTmp();
 tmpL=L.geoJSON(f,{style:{color:'#e11',weight:3,dashArray:'6',fillOpacity:.15}}).addTo(map);tmpL.eachLayer(l=>l.options.bubblingMouseEvents=false);
 const m=/^(산?\d+(?:-\d+)?)(.*)$/.exec((f.properties.jibun||'').replace(/\s/g,''));
-cur={key:k,reg:false,d:{f,jm:m?m[2]:'',larea:'',note:'',area:areaM2(f.geometry),owners:[NR()]}};restyle();side()}
+cur={key:k,reg:false,d:fixD({f,jm:m?m[2]:'',larea:'',note:'',area:areaM2(f.geometry),owners:[NR()]})};pj=null;restyle();side()}
 async function fetchAt(lat,lng){const e=2e-5;const r=await jsonp('https://api.vworld.kr/req/data?'+q({service:'data',request:'GetFeature',data:'LP_PA_CBND_BUBUN',key:KEY,domain:DOM,format:'json',size:10,page:1,geometry:'true',attribute:'true',crs:'EPSG:4326',geomFilter:`BOX(${lng-e},${lat-e},${lng+e},${lat+e})`}));
 if(r.response.status==='NOT_FOUND')return null;if(r.response.status!=='OK')throw new Error('필지 조회 실패: '+JSON.stringify(r.response.error||r.response.status));
 const fs=r.response.result.featureCollection.features;return fs.find(f=>inside(f.geometry,[lng,lat]))||fs[0]}
 async function pickAt(lat,lng){msg('필지 조회 중…');try{const f=await fetchAt(lat,lng);if(!f)return msg('해당 위치에 필지가 없습니다',1);selNew(f);msg('')}catch(x){msg(x.message,1)}}
-map.on('click',e=>{if($('#add').checked)pickAt(e.latlng.lat,e.latlng.lng)});
-$('#fnd').onclick=async()=>{const a=$('#adr').value.trim();if(!a)return;msg('주소 검색 중…');try{
-const g=await jsonp('https://api.vworld.kr/req/address?'+q({service:'address',request:'getCoord',version:'2.0',crs:'epsg:4326',address:a,refine:'true',simple:'false',format:'json',type:'PARCEL',key:KEY,domain:DOM}));
-if(g.response.status!=='OK')return msg('주소를 찾지 못했습니다',1);const x=+g.response.result.point.x,y=+g.response.result.point.y;map.setView([y,x],19);await pickAt(y,x)}catch(e){msg(e.message,1)}};
-const card=d=>{const o=curOwner(d);if(!o)return'<span class="m">권리자명을 입력하면 현재 권리자가 표시됩니다.</span>';
-return`<div class="cc" style="border-color:${colorOf(o.name)}"><b>${esc(o.name)}</b><dl><dt>주소</dt><dd>${esc(o.addr)||'-'}</dd><dt>등록번호</dt><dd>${esc(o.reg)||'-'}</dd><dt>접수</dt><dd>${esc(o.rdate)||'-'} ${o.rno?'제'+esc(o.rno)+'호':''}</dd><dt>등기원인</dt><dd>${esc(o.cdate)||'-'} ${esc(o.ctype)}</dd><dt>등기목적</dt><dd>${esc(o.purpose)||'-'}</dd>${o.note?`<dt>기타</dt><dd>${esc(o.note)}</dd>`:''}</dl></div>`};
-const F=(l,k,v,w,t='text')=>`<div class="${w?'w':''}"><label>${l}<input type="${t}" data-k="${k}" value="${esc(v)}"></label></div>`;
-function side(){const el=$('#side');if(!cur){el.innerHTML='<p class="m">지도에서 색칠된 필지를 클릭하면 토지정보와 현재 권리자가 표시됩니다.<br><br>새 필지는 상단에서 주소로 찾거나 「필지 추가 모드」를 켠 뒤 지도를 클릭하고, 소유자 정보를 저장하면 지도에 등록됩니다.</p>';return}
-const d=cur.d,p=d.f.properties,ua=useArea(d);
-el.innerHTML=`<h3>${esc(p.addr)}</h3><div class="m">${cur.reg?'등록된 필지':'미등록 필지 · 소유자 입력 후 저장하면 지도에 등록됩니다'}</div>
-<h4>토지정보</h4><dl><dt>지번</dt><dd>${esc(p.jibun)||'-'}</dd><dt>PNU</dt><dd>${esc(p.pnu)}</dd><dt>지목</dt><dd><input data-k="jm" value="${esc(d.jm)}"></dd>
-<dt>면적(도형)</dt><dd>${fmt(d.area)}㎡ <span class="m">참고값</span></dd><dt>면적(대장)</dt><dd><input type="number" data-k="larea" value="${esc(d.larea)}" placeholder="㎡ 직접 입력"></dd>
-<dt>적용 면적</dt><dd id="py">${fmt(ua)}㎡ (${fmt(ua*.3025)}평)</dd><dt>공시지가</dt><dd>${p.jiga?fmt(p.jiga)+'원/㎡ ('+esc(p.gosi_year)+'-'+esc(p.gosi_month)+')':'-'}</dd><dt>비고</dt><dd><input data-k="note" value="${esc(d.note)}"></dd></dl>
-<h4>현재 권리자</h4><div id="cc">${card(d)}</div>
-<h4>소유권이전 현황</h4>${d.owners.map((o,i)=>`<fieldset><legend>이력 ${i+1} <button data-a="rm" data-i="${i}">삭제</button></legend><div class="fg">${F('권리자명',`owners.${i}.name`,o.name,0)}${F('등기목적',`owners.${i}.purpose`,o.purpose,0)}${F('접수일자',`owners.${i}.rdate`,o.rdate,0,'date')}${F('접수번호',`owners.${i}.rno`,o.rno,0)}${F('등기원인일자',`owners.${i}.cdate`,o.cdate,0,'date')}${F('원인구분(매매·신탁 등)',`owners.${i}.ctype`,o.ctype,0)}${F('권리자 주소',`owners.${i}.addr`,o.addr,1)}${F('등록번호',`owners.${i}.reg`,o.reg,1)}${F('기타사항',`owners.${i}.note`,o.note,1)}</div></fieldset>`).join('')}
-<button data-a="add">+ 이력 추가</button><div class="act"><button class="p" data-a="save">저장</button>${cur.reg?'<button data-a="del">등록 해제</button>':''}</div>`}
-document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k||!cur)return;const a=k.split('.'),l=a.pop(),o=a.reduce((x,y)=>x[y],cur.d);o[l]=e.target.value;
-if(/^owners\./.test(k))$('#cc').innerHTML=card(cur.d);if(k=='larea'){const u=useArea(cur.d);$('#py').textContent=`${fmt(u)}㎡ (${fmt(u*.3025)}평)`}});
-document.addEventListener('change',e=>{const c=e.target.dataset.c;if(c){DB.c[c]=e.target.value;save();restyle();if(cur)$('#cc').innerHTML=card(cur.d)}});
-document.addEventListener('click',e=>{const t=e.target,a=t.dataset.a,ow=t.closest('[data-own]');
-if(ow&&!t.dataset.c){const b=L.featureGroup(Object.entries(LY).filter(([k])=>curOwner(DB.p[k]).name==ow.dataset.own).map(([k,l])=>l));if(b.getLayers().length)map.fitBounds(b.getBounds(),{maxZoom:19});return}
-if(!a||!cur)return;
-if(a=='add'){cur.d.owners.push(NR());side()}
-if(a=='rm'){cur.d.owners.splice(+t.dataset.i,1);if(!cur.d.owners.length)cur.d.owners.push(NR());side()}
-if(a=='save'){cur.d.owners=cur.d.owners.filter(o=>Object.values(o).some((v,i)=>v&&!(i==0&&v=='소유권이전')));
-if(!curOwner(cur.d)){if(!cur.d.owners.length)cur.d.owners.push(NR());side();return msg('권리자명을 한 건 이상 입력하세요',1)}
-const k=cur.key;DB.p[k]=JSON.parse(JSON.stringify(cur.d));clearTmp();cur=null;drawAll();selReg(k);msg('저장했습니다')}
-if(a=='del'&&confirm('이 필지의 등록을 해제할까요? 소유자 정보도 함께 삭제됩니다.')){delete DB.p[cur.key];cur=null;drawAll();side()}});
-$('#exp').onclick=()=>{const b=new Blob([JSON.stringify(DB)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='estate-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
-$('#imp').onclick=()=>$('#fi').click();
-$('#fi').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.p)throw 0;if(!confirm('현재 데이터를 백업 파일 내용으로 바꿉니다. 계속할까요?'))return;DB={p:d.p,c:d.c||{}};cur=null;drawAll();side();fitAll();msg('불러왔습니다')}catch(x){msg('백업 파일 형식이 올바르지 않습니다',1)}e.target.value=''};
-function fitAll(){if(reg.getLayers().length)map.fitBounds(reg.getBounds(),{maxZoom:18,padding:[30,30]})}
-
-/* ===== 엑셀 일괄 등록 ===== */
-const ALI={addr:['주소','소재지','지번주소','토지소재지'],name:['권리자명','권리자','소유자','소유자명'],purpose:['등기목적','목적'],rdate:['접수일자','접수일'],rno:['접수번호'],cdate:['등기원인일자','원인일자'],ctype:['원인구분','등기원인','구분'],oaddr:['권리자주소','소유자주소'],reg:['등록번호','주민등록번호','법인등록번호'],note:['기타사항','기타','비고'],jm:['지목'],larea:['대장면적','면적']};
-const nk=s=>String(s).replace(/\s/g,'');
-const nd=v=>{if(v instanceof Date){const d=new Date(v.getTime()+432e5);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-const m=/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(String(v));return m?`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`:String(v??'')};
 const geo=async a=>{const g=await jsonp('https://api.vworld.kr/req/address?'+q({service:'address',request:'getCoord',version:'2.0',crs:'epsg:4326',address:a,refine:'true',simple:'false',format:'json',type:'PARCEL',key:KEY,domain:DOM}));
 if(g.response.status!=='OK')throw new Error('주소를 찾지 못함');return[+g.response.result.point.y,+g.response.result.point.x]};
-$('#xt').onclick=()=>{const h=['주소','권리자명','등기목적','접수일자','접수번호','등기원인일자','원인구분','권리자주소','등록번호','기타사항','지목','대장면적'];
-const ws=XLSX.utils.aoa_to_sheet([h,['경기도 광주시 탄벌동 214-4','(주)샘플','소유권이전','2021-08-10','12345','2021-07-30','매매','서울특별시 중구 …','110111-*******','','대',''],['경기도 광주시 탄벌동 214-4','(주)샘플2','소유권이전','2023-03-02','2345','2023-02-20','신탁','','','','','']]),wb=XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(wb,ws,'자산');XLSX.writeFile(wb,'자산등록양식.xlsx')};
+map.on('click',e=>{if($('#add').checked)pickAt(e.latlng.lat,e.latlng.lng)});
+$('#fnd').onclick=async()=>{const a=$('#adr').value.trim();if(!a)return;msg('주소 검색 중…');try{const[y,x]=await geo(a);map.setView([y,x],19);await pickAt(y,x)}catch(e){msg(e.message,1)}};
+$('#mm').onchange=()=>{if(!$('#mm').checked)msel.clear();restyle()};
+/* ----- 우측 패널 ----- */
+const TABS=[['land','토지'],['plan','도시계획'],['price','공시지가'],['own','소유권'],['dev','개발계획']];
+const NEWR={hist:{date:'',jm:'',area:'',reason:''},prices:{year:'',price:'',date:''},owners:null,floors:{f:'',a:''},extra:{addr:'',area:'',jm:'',cost:''},permit:{kind:'',cdate:'',vendor:'',dep:'',prog:'',sched:''},cons:{kind:'',cdate:'',vendor:'',dep:'',prog:'',sched:''},taxes:{name:'',amt:''}};
+const rt=k=>k.startsWith('J.')?[pj&&pj.d,k.slice(2).split('.')]:[cur&&cur.d,k.split('.')];
+const getv=k=>{const[o,a]=rt(k);return a.reduce((x,y)=>x==null?x:x[y],o)};
+const setv=(k,v)=>{const[o,a]=rt(k),l=a.pop();a.reduce((x,y)=>x[y],o)[l]=v};
+const I=(k,t='text',ph='')=>`<input data-k="${k}" type="${t}" value="${esc(getv(k))}" placeholder="${ph}">`;
+const LI=(l,k,t='text')=>`<label>${l}${I(k,t)}</label>`;
+const T=(k,cols,tot)=>{const rows=getv(k)||[];return`<div class="tw"><table><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}${tot?'<th>합계</th>':''}<th></th></tr>${rows.map((r,i)=>`<tr>${cols.map(c=>`<td>${I(k+'.'+i+'.'+c[0],c[2])}</td>`).join('')}${tot?`<td class="n" data-tot="${k}.${i}"></td>`:''}<td><button class="x" data-del="${k}.${i}" aria-label="행 삭제">×</button></td></tr>`).join('')}</table></div><button data-add="${k}">+ 행 추가</button>`};
+const card=d=>{const o=curOwner(d);if(!o)return'<span class="m">권리자명을 입력하면 현재 권리자가 표시됩니다.</span>';
+return`<div class="cc" style="border-color:${colorOf(o.name)}"><b>${esc(o.name)}</b><dl><dt>주소</dt><dd>${esc(o.addr)||'-'}</dd><dt>등록번호</dt><dd>${esc(o.reg)||'-'}</dd><dt>접수</dt><dd>${esc(o.rdate)||'-'} ${o.rno?'제'+esc(o.rno)+'호':''}</dd><dt>등기원인</dt><dd>${esc(o.cdate)||'-'} ${esc(o.ctype)}</dd><dt>등기목적</dt><dd>${esc(o.purpose)||'-'}</dd>${o.note?`<dt>기타</dt><dd>${esc(o.note)}</dd>`:''}</dl></div>`};
+function side(){const el=$('#side');if(!cur){el.innerHTML='<p class="m">지도에서 색칠된 필지를 클릭하면 토지정보, 도시계획, 공시지가, 현재 권리자가 표시됩니다.<br><br>새 필지는 주소로 찾거나 「필지 추가」를 켜고 지도를 클릭한 뒤, 소유자 정보를 저장하면 등록됩니다. 여러 필지는 「엑셀 일괄 등록」을 쓰세요.</p>';return}
+const p=cur.d.f.properties;
+el.innerHTML=`<h3>${esc(p.addr)}</h3><div class="m">${cur.reg?'등록된 필지':'미등록 필지 · 소유자 입력 후 저장하면 지도에 등록됩니다'}</div><div id="cc" style="margin-top:6px">${card(cur.d)}</div>
+<div class="tabs">${TABS.map(([k,l])=>`<button data-tab="${k}" class="${tab==k?'on':''}">${l}</button>`).join('')}</div><div id="tb">${body()}</div>
+<div class="act"><button class="p" data-a="save">필지 저장</button>${cur.reg?'<button data-a="del">등록 해제</button>':''}</div>`;updSum()}
+function body(){const d=cur.d,p=d.f.properties,ua=useArea(d);
+if(tab=='land')return`<dl><dt>위치</dt><dd>${esc(p.addr)}</dd><dt>지번</dt><dd>${esc(p.jibun)||'-'}</dd><dt>PNU</dt><dd>${esc(p.pnu)}</dd><dt>지목</dt><dd>${I('jm')}</dd>
+<dt>면적(도형)</dt><dd>${fmt(d.area)}㎡ <span class="m">참고값</span></dd><dt>면적(대장)</dt><dd>${I('larea','number','㎡ 직접 입력')}</dd><dt>적용 면적</dt><dd id="py">${fmt(ua)}㎡ (${fmt(ua*.3025)}평)</dd><dt>비고</dt><dd>${I('note')}</dd></dl>
+<h4>토지이동연혁</h4>${T('hist',[['date','일자','date'],['jm','지목'],['area','면적(㎡)','number'],['reason','토지이동사유']])}`;
+if(tab=='plan')return`<dl><dt>용도지역</dt><dd>${I('zone.use')}</dd><dt>용도지구</dt><dd>${I('zone.dist')}</dd><dt>건폐율(%)</dt><dd>${I('zone.bcr','number')}</dd><dt>용적률(%)</dt><dd>${I('zone.far','number')}</dd><dt>기타 제한·규정</dt><dd>${I('zone.etc','text','예: 성장관리계획구역, 개발행위허가 제한')}</dd></dl>`;
+if(tab=='price')return`<dl><dt>기준년월</dt><dd>${I('pbase','text','예: 2026-01')}</dd><dt>지적도 공시지가</dt><dd>${p.jiga?fmt(p.jiga)+'원/㎡ ('+esc(p.gosi_year)+'-'+esc(p.gosi_month)+')':'-'}</dd></dl><h4>연도별 개별공시지가</h4>${T('prices',[['year','기준연도'],['price','공시지가(원/㎡)','number'],['date','공시일자','date']])}`;
+if(tab=='own')return d.owners.map((o,i)=>`<fieldset><legend>이력 ${i+1} <button class="x" data-del="owners.${i}">삭제</button></legend><div class="fg">${LI('권리자명',`owners.${i}.name`)}${LI('등기목적',`owners.${i}.purpose`)}${LI('접수일자',`owners.${i}.rdate`,'date')}${LI('접수번호',`owners.${i}.rno`)}${LI('등기원인일자',`owners.${i}.cdate`,'date')}${LI('원인구분(매매·신탁 등)',`owners.${i}.ctype`)}<div class="w">${LI('권리자 주소',`owners.${i}.addr`)}</div><div class="w">${LI('등록번호',`owners.${i}.reg`)}</div><div class="w">${LI('기타사항',`owners.${i}.note`)}</div></div></fieldset>`).join('')+'<button data-add="owners">+ 이력 추가</button>';
+return devBody()}
+function loadPj(id){pj={key:id,d:clone(DB.j[id])}}
+function devBody(){const mine=Object.entries(DB.j).filter(([,j])=>j.ids.includes(cur.key)),n=[...msel].filter(x=>x!=cur.key).length;
+let h=`<button class="p" data-a="newpj">새 개발그룹 만들기${n?` (이 필지 + 선택 ${n}필지)`:''}</button><p class="m">여러 필지를 묶으려면 상단 「여러 필지 선택」을 켜고 지도에서 필지를 눌러 고른 뒤 만드세요.</p>`;
+if(!mine.length)return h+'<p class="m">이 필지가 속한 개발그룹이 없습니다.</p>';
+if(!pj||!mine.some(([id])=>id==pj.key))loadPj(mine[0][0]);const d=pj.d,pc2=[['kind','항목'],['cdate','계약일자','date'],['vendor','업체'],['dep','계약금','number'],['prog','기성금','number'],['sched','지급일정']];
+return h+`<select id="pjs" style="width:100%">${mine.map(([id,j])=>`<option value="${id}" ${id==pj.key?'selected':''}>${esc(j.name||'(이름 없음)')}</option>`).join('')}</select>
+<p class="m">포함 필지: ${d.ids.map(i=>esc(DB.p[i]?DB.p[i].f.properties.jibun||DB.p[i].f.properties.addr:i)).join(', ')}</p>
+<div class="g">${LI('개발구역명칭','J.name')}${LI('사업시행자','J.op')}${LI('사업유형','J.type')}${LI('용도','J.usage')}${LI('건축면적(㎡)','J.barea','number')}${LI('연면적(㎡)','J.garea','number')}</div>
+<h4>층별면적</h4>${T('J.floors',[['f','층'],['a','면적(㎡)','number']])}
+<h4>사업일정</h4><div class="g">${LI('인허가접수일','J.s1','date')}${LI('인허가종료일','J.s2','date')}${LI('착공일','J.s3','date')}${LI('착공종료일','J.s4','date')}${LI('준공접수일','J.s5','date')}${LI('준공완료일','J.s6','date')}</div>
+<h4>토지비용</h4><div class="g">${LI('기존 보유비용(원)','J.held','number')}</div><p class="m">추가 매입 필요 토지</p>${T('J.extra',[['addr','소재지'],['area','면적(㎡)','number'],['jm','지목'],['cost','매입비용(원)','number']])}
+<h4>인허가비용</h4>${T('J.permit',pc2,1)}<h4>착공비용</h4>${T('J.cons',pc2,1)}<h4>예상 세금</h4>${T('J.taxes',[['name','항목'],['amt','금액(원)','number']])}
+<h4>사업비 요약</h4><div id="sum"></div><div class="act" style="position:static"><button class="p" data-a="savepj">개발계획 저장</button><button data-a="delpj">그룹 삭제</button></div>`}
+function updSum(){document.querySelectorAll('[data-tot]').forEach(e=>{const r=getv(e.dataset.tot);e.textContent=won(num(r.dep)+num(r.prog))});const s=$('#sum');if(!s||!pj)return;
+const d=pj.d,a=d.extra.reduce((t,r)=>t+num(r.cost),0),pm=d.permit.reduce((t,r)=>t+num(r.dep)+num(r.prog),0),cs=d.cons.reduce((t,r)=>t+num(r.dep)+num(r.prog),0),tx=d.taxes.reduce((t,r)=>t+num(r.amt),0),h=num(d.held);
+s.innerHTML=[['기존 보유 토지',h],['추가 매입 토지',a],['인허가비용',pm],['착공비용',cs],['예상 세금',tx]].map(([l,v])=>`<div class="sm"><span>${l}</span><span>${won(v)}</span></div>`).join('')+`<div class="sm"><span>총 사업비</span><b>${won(h+a+pm+cs+tx)}</b></div>`}
+document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k||!cur)return;setv(k,e.target.value);
+if(k.startsWith('owners.'))$('#cc').innerHTML=card(cur.d);if(k=='larea'||k=='jm'){const u=useArea(cur.d);$('#py').textContent=`${fmt(u)}㎡ (${fmt(u*.3025)}평)`}if(k.startsWith('J.'))updSum()});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset.c){DB.c[t.dataset.c]=t.value;put([pc()]);restyle();legend();if(cur)$('#cc').innerHTML=card(cur.d)}
+if(t.id=='pjs'){loadPj(t.value);$('#tb').innerHTML=body();updSum()}});
+const rowNew=k=>{const n=k.split('.').pop();return n=='owners'?NR():{...NEWR[n]}};
+document.addEventListener('click',e=>{const t=e.target,a=t.dataset.a,ow=t.closest('[data-own]');
+if(ow&&!t.dataset.c){const b=L.featureGroup(Object.entries(LY).filter(([k])=>curOwner(DB.p[k]).name==ow.dataset.own).map(([k,l])=>l));if(b.getLayers().length)map.fitBounds(b.getBounds(),{maxZoom:19});return}
+if(t.dataset.tab&&cur){tab=t.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab==tab));$('#tb').innerHTML=body();updSum();return}
+if(t.dataset.add&&cur){getv(t.dataset.add).push(rowNew(t.dataset.add));$('#tb').innerHTML=body();updSum();return}
+if(t.dataset.del&&cur){const k=t.dataset.del.split('.'),i=+k.pop();getv(k.join('.')).splice(i,1);$('#tb').innerHTML=body();updSum();$('#cc').innerHTML=card(cur.d);return}
+if(!a||!cur)return;
+if(a=='save'){const d=cur.d,ne=o=>Object.values(o).some(v=>v!==''&&v!=null);d.hist=d.hist.filter(ne);d.prices=d.prices.filter(ne);d.owners=d.owners.filter(o=>o.name);
+if(!d.owners.length){d.owners.push(NR());$('#tb').innerHTML=body();return msg('권리자명을 한 건 이상 입력하세요(소유권 탭)',1)}
+const k=cur.key;DB.p[k]=clone(d);put([{k:'p:'+k,v:DB.p[k]},pc()]);clearTmp();cur=null;drawAll();selReg(k,1);msg(ON?'저장 중…':'저장했습니다')}
+if(a=='del'&&confirm('이 필지의 등록을 해제할까요? 소유자 정보도 함께 삭제됩니다.')){del(['p:'+cur.key]);delete DB.p[cur.key];cur=null;drawAll();side()}
+if(a=='newpj'){const id='j'+Date.now().toString(36),pm=['건축설계','개발행위','재해영향평가','문화재조사','환경영향평가','기타'].map(k=>({...NEWR.permit,kind:k}));
+DB.j[id]={name:'새 개발구역',ids:[...new Set([cur.key,...msel])],op:'',type:'',usage:'',barea:'',garea:'',floors:[{f:'1층',a:''}],s1:'',s2:'',s3:'',s4:'',s5:'',s6:'',held:'',extra:[],permit:pm,cons:[{...NEWR.cons,kind:'공사비'}],taxes:['농지전용부담금','대체산지조성비','개발부담금'].map(n=>({name:n,amt:''}))};
+put([{k:'j:'+id,v:DB.j[id]}]);loadPj(id);$('#tb').innerHTML=body();updSum()}
+if(a=='savepj'&&pj){DB.j[pj.key]=clone(pj.d);put([{k:'j:'+pj.key,v:DB.j[pj.key]}]);msg(ON?'저장 중…':'개발계획을 저장했습니다')}
+if(a=='delpj'&&pj&&confirm('개발그룹을 삭제할까요?')){del(['j:'+pj.key]);delete DB.j[pj.key];pj=null;$('#tb').innerHTML=body();updSum()}});
+$('#exp').onclick=()=>{const b=new Blob([JSON.stringify(DB)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='estate-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
+/* ===== 엑셀 일괄 등록 (주소를 시도/시군구/읍면동/리/지번으로 분리) ===== */
+const AK=['시도','시군구','읍면동','리','지번'],S=v=>String(v??'').trim();
+const nd=v=>{if(v instanceof Date){const d=new Date(v.getTime()+432e5);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+const m=/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(String(v));return m?`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`:S(v)};
+const addrOf=r=>S(r['주소'])||AK.map(k=>S(r[k])).filter(Boolean).join(' ');
+$('#xt').onclick=()=>{const k=['경기도','광주시','탄벌동','','214-4'],wb=XLSX.utils.book_new(),add=(n,h,rs)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([AK.concat(h),...rs.map(r=>k.concat(r))]),n);
+add('필지',['지목','대장면적','용도지역','용도지구','건폐율','용적률','기타제한','공시지가기준월','비고'],[['대','1650','계획관리지역','','40','100','','2026-01','']]);
+add('소유권',['등기목적','접수일자','접수번호','등기원인일자','원인구분','권리자명','권리자주소','등록번호','기타사항'],[['소유권이전','2021-08-10','12345','2021-07-30','매매','(주)샘플','서울특별시 중구 …','110111-*******',''],['소유권이전','2023-03-02','2345','2023-02-20','신탁','(주)샘플신탁','','','']]);
+add('토지이동연혁',['일자','지목','면적','토지이동사유'],[['2018-03-12','전','1770','분할'],['2021-07-01','대','1650','지목변경']]);
+add('공시지가',['기준연도','개별공시지가','공시일자'],[['2024','','2024-05-31'],['2025','','2025-05-30']]);XLSX.writeFile(wb,'자산등록양식.xlsx')};
 $('#xl').onclick=()=>$('#xf').click();
 $('#xf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-try{const wb=XLSX.read(await f.arrayBuffer(),{cellDates:true}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});if(!rows.length)throw new Error('데이터가 없습니다');
-const hd=Object.keys(rows[0]),H={};Object.entries(ALI).forEach(([k,al])=>{H[k]=hd.find(h=>al.includes(nk(h)))});
-if(!H.addr||!H.name)throw new Error('「주소」와 「권리자명」 열이 필요합니다. 현재 열: '+hd.join(', '));
-const v=(r,k)=>H[k]?r[H[k]]:'',gr={};rows.forEach(r=>{const a=String(v(r,'addr')).trim();if(a)(gr[a]??=[]).push(r)});
-const ad=Object.keys(gr),over=confirm(`${ad.length}개 주소를 등록합니다.\n이미 등록된 필지는 엑셀 내용으로 덮어쓸까요?\n확인=덮어쓰기 / 취소=건너뛰기`),bad=[];let n=0,ok=0;
+try{const wb=XLSX.read(await f.arrayBuffer(),{cellDates:true}),nr=r=>Object.fromEntries(Object.entries(r).map(([k,v])=>[nk(k),v])),
+sh=(re,fb)=>{const s=wb.SheetNames.find(x=>re.test(x))||fb;return s?XLSX.utils.sheet_to_json(wb.Sheets[s],{defval:''}).map(nr):[]};
+const P=sh(/필지|토지정보|자산/,wb.SheetNames[0]),H=sh(/이동|연혁/),PR=sh(/공시/),O0=sh(/소유|권리/),O=O0.length?O0:P.filter(r=>r['권리자명']||r['소유자']);
+const G={};const add=(k,r)=>{const a=addrOf(r);if(a)(G[a]??={p:[],h:[],pr:[],o:[]})[k].push(r)};P.forEach(r=>add('p',r));H.forEach(r=>add('h',r));PR.forEach(r=>add('pr',r));O.forEach(r=>add('o',r));
+const ad=Object.keys(G);if(!ad.length)throw new Error('주소(시도·시군구·읍면동·지번 열)를 찾지 못했습니다. 「양식 받기」의 열 이름을 확인하세요');
+const over=confirm(`${ad.length}개 필지를 등록합니다.\n이미 등록된 필지는 엑셀 내용으로 덮어쓸까요?\n확인=덮어쓰기 / 취소=건너뛰기`),bad=[],items=[];let n=0,ok=0;
 const one=async a=>{try{const[y,x]=await geo(a),f2=await fetchAt(y,x);if(!f2)throw new Error('해당 위치에 필지가 없음');const k=f2.properties.pnu;
 if(DB.p[k]&&curOwner(DB.p[k])&&!over){bad.push([a,'건너뜀(이미 등록)']);return}
-const rs=gr[a],pr=rs.find(r=>v(r,'jm')||v(r,'larea'))||{},m=/^(산?\d+(?:-\d+)?)(.*)$/.exec((f2.properties.jibun||'').replace(/\s/g,''));
-DB.p[k]={f:f2,jm:String(v(pr,'jm')||(m?m[2]:'')),larea:v(pr,'larea')||'',note:'',area:areaM2(f2.geometry),owners:rs.filter(r=>v(r,'name')).map(r=>({purpose:String(v(r,'purpose')||'소유권이전'),rdate:nd(v(r,'rdate')),rno:String(v(r,'rno')),cdate:nd(v(r,'cdate')),ctype:String(v(r,'ctype')),name:String(v(r,'name')).trim(),addr:String(v(r,'oaddr')),reg:String(v(r,'reg')),note:String(v(r,'note'))}))};ok++}
+const g=G[a],r=g.p[0]||{},m=/^(산?\d+(?:-\d+)?)(.*)$/.exec((f2.properties.jibun||'').replace(/\s/g,''));
+const d={f:f2,jm:S(r['지목'])||(m?m[2]:''),larea:S(r['대장면적']),note:S(r['비고']),area:areaM2(f2.geometry),zone:{use:S(r['용도지역']),dist:S(r['용도지구']),bcr:S(r['건폐율']),far:S(r['용적률']),etc:S(r['기타제한'])},pbase:S(r['공시지가기준월']),
+hist:g.h.map(x=>({date:nd(x['일자']),jm:S(x['지목']),area:S(x['면적']),reason:S(x['토지이동사유'])})),prices:g.pr.map(x=>({year:S(x['기준연도']),price:S(x['개별공시지가']),date:nd(x['공시일자'])})),
+owners:g.o.filter(x=>S(x['권리자명']||x['소유자'])).map(x=>({purpose:S(x['등기목적'])||'소유권이전',rdate:nd(x['접수일자']),rno:S(x['접수번호']),cdate:nd(x['등기원인일자']),ctype:S(x['원인구분']),name:S(x['권리자명']||x['소유자']),addr:S(x['권리자주소']),reg:S(x['등록번호']),note:S(x['기타사항'])}))};
+if(!d.owners.length)throw new Error('권리자 정보 없음(지도에 표시되지 않음)');DB.p[k]=d;items.push({k:'p:'+k,v:d});ok++}
 catch(x){bad.push([a,x.message])}msg(`엑셀 등록 중… ${++n}/${ad.length}`)};
 const qu=[...ad];await Promise.all([0,1,2].map(async()=>{while(qu.length)await one(qu.shift())}));
-cur=null;drawAll();fitAll();msg(`완료: ${ok}필지 등록 · 실패/건너뜀 ${bad.length}건`,bad.length>0);
-$('#side').innerHTML=`<h3>엑셀 등록 결과</h3><p>등록 ${ok}필지 / 전체 ${ad.length}주소</p>`+(bad.length?`<h4>확인이 필요한 주소</h4>`+bad.map(b=>`<div class="er">${esc(b[0])}<br><span class="m">${esc(b[1])}</span></div>`).join('<hr>'):'')}
+items.push(pc());put(items);cur=null;drawAll();fitAll();msg(`완료: ${ok}필지 등록 · 확인 필요 ${bad.length}건`,bad.length>0);
+$('#side').innerHTML=`<h3>엑셀 등록 결과</h3><p>등록 ${ok}필지 / 전체 ${ad.length}필지</p>`+(bad.length?`<h4>확인이 필요한 항목</h4>`+bad.map(b=>`<div class="er">${esc(b[0])}<br><span class="m">${esc(b[1])}</span></div>`).join('<hr>'):'')}
 catch(x){msg(x.message,1)}};
 /* ===== 지역 이동 ===== */
 const SIDO=[['서울특별시','11'],['부산광역시','26'],['대구광역시','27'],['인천광역시','28'],['광주광역시','29'],['대전광역시','30'],['울산광역시','31'],['세종특별자치시','36'],['경기도','41'],['강원특별자치도','51'],['충청북도','43'],['충청남도','44'],['전북특별자치도','52'],['전라남도','46'],['경상북도','47'],['경상남도','48'],['제주특별자치도','50']];
@@ -162,8 +226,7 @@ async function loadKids(k,code,lv){if(RG.kids[k]||RG.load[k])return;RG.load[k]=1
 try{const d=lv?'LT_C_ADEMD_INFO':'LT_C_ADSIGG_INFO',fl=lv?'emd_cd':'sig_cd';
 const r=await jsonp('https://api.vworld.kr/req/data?'+q({service:'data',request:'GetFeature',data:d,key:KEY,domain:DOM,format:'json',size:1000,page:1,geometry:'false',attribute:'true',attrFilter:`${fl}:like:${code}`}));
 if(r.response.status!=='OK')throw new Error(JSON.stringify(r.response.error||r.response.status));
-RG.kids[k]=r.response.result.featureCollection.features.map(x=>x.properties).filter(p=>String(p[fl]).startsWith(code)).map(p=>{const t=(p.full_nm||'').split(/\s+/);
-return{cd:p[fl],n:lv?(p.emd_kor_nm||t[t.length-1]):(t.slice(1).join(' ')||p.sig_kor_nm)}});
+RG.kids[k]=r.response.result.featureCollection.features.map(x=>x.properties).filter(p=>String(p[fl]).startsWith(code)).map(p=>{const t=(p.full_nm||'').split(/\s+/);return{cd:p[fl],n:lv?(p.emd_kor_nm||t[t.length-1]):(t.slice(1).join(' ')||p.sig_kor_nm)}});
 if(!RG.kids[k].length)msg('하위 지역 목록이 비어 있습니다(지역 코드 확인 필요)',1)}
 catch(x){RG.kids[k]=[];msg('전체 지역 목록 불러오기 실패: '+x.message,1)}delete RG.load[k];rgRender()}
 function rgRender(){const{c,cd,A}=rgData(),out=[];
@@ -174,17 +237,41 @@ const walk=(pk,lv)=>kids(pk,lv).forEach(([k,o])=>{const n=c[k]||0,op=RG.open[k];
 out.push(`<div class="rn ${n?'':'z'} ${RG.sel==k?'on':''}" data-rk="${esc(k)}" data-lv="${lv}" data-cd="${o.cd||''}" style="padding-left:${6+lv*12}px"><i>${lv==2?'':op?'▾':'▸'}</i><span>${esc(o.n)}</span>${n?`<b>${n}</b>`:''}</div>`);
 if(op&&lv<2)walk(k,lv+1)});walk('',0);$('#rg').innerHTML=out.join('')}
 async function goRegion(k,lv,code){if(bnd){bnd.remove();bnd=null}
-const ks=Object.entries(LY).filter(([pk])=>{const t=rgOf(DB.p[pk]);let a='';const ch=t.map(n=>a=rKey(a.length?a:'',n));return ch[lv]==k}).map(x=>x[1]);
+const ks=Object.entries(LY).filter(([pk])=>{let a='';return rgOf(DB.p[pk]).map(n=>a=rKey(a,n))[lv]==k}).map(x=>x[1]);
 if(ks.length){map.fitBounds(L.featureGroup(ks).getBounds(),{maxZoom:18,padding:[30,30]});return}
-if(lv<2){msg('이 지역에는 등록된 자산이 없습니다. 아래 단계(시군구·읍면동)를 펼쳐 선택하세요.');return}
-$('#add').checked=true;cur=null;
+if(lv<2){msg('이 지역에는 등록된 자산이 없습니다. 하위 지역을 펼쳐 선택하세요.');return}
+$('#add').checked=true;cur=null;restyle();
 $('#side').innerHTML='<h3>등록된 자산이 없는 지역</h3><p class="m">필지 추가 모드를 켰습니다. 지도에서 필지를 클릭해 소유자 정보를 입력하거나, 「엑셀 일괄 등록」으로 한 번에 등록하세요.</p>';
 if(!code)return msg('지역 코드를 알 수 없어 지도를 이동하지 못했습니다',1);msg('지역 경계 조회 중…');
 try{const r=await jsonp('https://api.vworld.kr/req/data?'+q({service:'data',request:'GetFeature',data:'LT_C_ADEMD_INFO',key:KEY,domain:DOM,format:'json',size:10,page:1,geometry:'true',attribute:'true',crs:'EPSG:4326',attrFilter:'emd_cd:=:'+code}));
-if(r.response.status!=='OK')throw new Error('경계 조회 실패 '+(r.response.status));bnd=L.geoJSON(r.response.result.featureCollection,{style:{color:'#888',weight:2,dashArray:'6',fill:false},interactive:false}).addTo(map);map.fitBounds(bnd.getBounds());msg('')}
+if(r.response.status!=='OK')throw new Error('경계 조회 실패 '+r.response.status);bnd=L.geoJSON(r.response.result.featureCollection,{style:{color:'#888',weight:2,dashArray:'6',fill:false},interactive:false}).addTo(map);map.fitBounds(bnd.getBounds());msg('')}
 catch(x){msg(x.message,1)}}
 document.addEventListener('click',e=>{const r=e.target.closest('.rn');if(!r)return;const k=r.dataset.rk,lv=+r.dataset.lv,cdv=r.dataset.cd;RG.sel=k;
 if(lv<2){RG.open[k]=!RG.open[k];if(RG.open[k]&&cdv)loadKids(k,cdv,lv)}goRegion(k,lv,cdv);rgRender()});
-
-drawAll();side();fitAll();
+function fitAll(){if(reg.getLayers().length)map.fitBounds(reg.getBounds(),{maxZoom:18,padding:[30,30]})}
+/* ===== 화면 분할 크기 조절 ===== */
+let LAY={};try{LAY=JSON.parse(localStorage.getItem('re_lay'))||{}}catch(e){}
+const dfl=()=>({rw:Math.round(innerWidth*.26),lh:Math.round(innerHeight*.22)});
+function applyLay(){const a=$('#app').style,d=dfl();a.setProperty('--rw',(LAY.hide?0:LAY.rw||d.rw)+'px');a.setProperty('--lh',(LAY.lh||d.lh)+'px');map.invalidateSize()}
+function drag(el,fn,key){el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);const mv=ev=>{fn(ev);LAY.hide=false;applyLay()},up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);try{localStorage.setItem('re_lay',JSON.stringify(LAY))}catch(x){}};el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up)});
+el.addEventListener('dblclick',()=>{delete LAY[key];LAY.hide=false;applyLay();try{localStorage.setItem('re_lay',JSON.stringify(LAY))}catch(x){}})}
+drag($('#sp1'),e=>LAY.rw=Math.round(Math.min(innerWidth*.75,Math.max(240,innerWidth-e.clientX))),'rw');
+drag($('#sp2'),e=>{const r=$('#app').getBoundingClientRect();LAY.lh=Math.round(Math.min(r.height*.7,Math.max(60,r.bottom-e.clientY)))},'lh');
+$('#tp').onclick=()=>{LAY.hide=!LAY.hide;applyLay();try{localStorage.setItem('re_lay',JSON.stringify(LAY))}catch(x){}};
+addEventListener('resize',applyLay);applyLay();
+/* ===== 시작 ===== */
+function boot(){drawAll();side();fitAll()}
+async function start(){
+if(!ON){try{DB=JSON.parse(localStorage.getItem('re_map2')||localStorage.getItem('re_map1'))||DB}catch(e){}DB.j??={};DB.c??={};msg('서버 미설정: 이 브라우저에만 저장됩니다',1);return boot()}
+$('#sy').hidden=$('#lo').hidden=false;
+const sv=localStorage.getItem('re_code')||sessionStorage.getItem('re_code');
+if(sv)try{await login(sv,!!localStorage.getItem('re_code'));return boot()}catch(e){}
+$('#gate').hidden=false}
+$('#gf').onsubmit=async e=>{e.preventDefault();$('#ge').textContent='';try{await login($('#code').value,$('#rmb').checked);$('#gate').hidden=true;boot();
+try{const old=JSON.parse(localStorage.getItem('re_map2')||localStorage.getItem('re_map1'));const ks=old&&old.p?Object.keys(old.p).filter(k=>!DB.p[k]):[];
+if(ks.length&&confirm(`이 브라우저에 저장된 필지 ${ks.length}개가 서버에 없습니다. 서버로 올릴까요?`)){ks.forEach(k=>DB.p[k]=old.p[k]);Object.assign(DB.c,old.c||{});put(ks.map(k=>({k:'p:'+k,v:DB.p[k]})).concat(pc()));drawAll()}}catch(x){}}
+catch(x){$('#ge').textContent=x.message}};
+$('#sy').onclick=async()=>{try{await login(CODE,!!localStorage.getItem('re_code'));cur=null;boot();msg('서버 데이터로 새로고침했습니다')}catch(x){msg(x.message,1)}};
+$('#lo').onclick=()=>{try{localStorage.removeItem('re_code');sessionStorage.removeItem('re_code')}catch(e){}location.reload()};
+start();
 </script></body></html>
